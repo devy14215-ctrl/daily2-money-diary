@@ -1,0 +1,3272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#124B44">
+<title>Shailu Bhai — Daily Collection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF3F0;
+    --card:#FFFFFF;
+    --ink:#152220;
+    --ink-soft:#4B5C57;
+    --line:#DDE5DF;
+    --brand:#124B44;
+    --brand-2:#1B6E63;
+    --paid:#227A4E;
+    --paid-bg:#E7F5EC;
+    --due:#B4602A;
+    --due-bg:#FBEEE2;
+    --penalty:#A5372E;
+    --penalty-bg:#FAEAE8;
+    --gold:#B8923B;
+    --radius-card: 14px;
+    --radius-pill: 999px;
+    --muted: var(--ink-soft);
+    --border: var(--line);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);position:relative;}
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;font-weight:600;letter-spacing:-0.01em;}
+  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  input,select,textarea{font-family:inherit;}
+
+  /* ---- Top bar ---- */
+  .topbar{
+    background:var(--brand);
+    color:#fff;
+    padding:18px 18px 22px;
+    border-radius:0 0 22px 22px;
+  }
+  .topbar-row{display:flex;justify-content:space-between;align-items:flex-start;}
+  .topbar h1{font-size:22px;color:#fff;}
+  .topbar .date{font-size:12.5px;color:#B9D6CE;margin-top:2px;}
+  .topbar-stats{display:flex;gap:10px;margin-top:16px;}
+  .tstat{flex:1;background:rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;}
+  .tstat .lbl{font-size:10.5px;color:#BFE0D8;text-transform:uppercase;letter-spacing:.04em;}
+  .tstat .val{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-top:3px;color:#fff;}
+
+  /* ---- Content ---- */
+  .content{flex:1;padding:16px 16px calc(90px + env(safe-area-inset-bottom));}
+  .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:18px 0 8px;}
+  .section-title:first-child{margin-top:0;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-card);
+    padding:14px;
+    margin-bottom:10px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-card .lbl{font-size:11.5px;color:var(--ink-soft);}
+  .stat-card .val{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-top:4px;}
+
+  .empty{
+    text-align:center;color:var(--ink-soft);font-size:13.5px;padding:26px 10px;
+  }
+
+  /* customer row */
+  .crow{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .crow .name{font-weight:600;font-size:15px;}
+  .crow .sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .amt{font-family:'Fraunces',serif;font-size:16px;font-weight:600;}
+  .badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:var(--radius-pill);font-weight:600;letter-spacing:.02em;}
+  .badge.paid{background:var(--paid-bg);color:var(--paid);}
+  .badge.due{background:var(--due-bg);color:var(--due);}
+  .badge.penalty{background:var(--penalty-bg);color:var(--penalty);}
+
+  .btnrow{display:flex;gap:8px;margin-top:10px;}
+  .btn{border:none;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:600;flex:1;text-align:center;}
+  .btn-primary{background:var(--brand);color:#fff;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink);}
+  .btn-wa-paid{background:var(--paid-bg);color:var(--paid);}
+  .btn-wa-due{background:var(--due-bg);color:var(--due);}
+  .btn-small{padding:7px 10px;font-size:12px;}
+  .btn-danger{background:var(--penalty-bg);color:var(--penalty);}
+  .btn:disabled{opacity:.5;cursor:wait;pointer-events:none;}
+
+  input[type=text],input[type=number],input[type=date],input[type=tel],select,textarea{
+    width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:10px;
+    font-size:14.5px;background:#fff;color:var(--ink);margin-top:5px;
+  }
+  label{font-size:12.5px;color:var(--ink-soft);font-weight:600;display:block;margin-top:12px;}
+  label:first-child{margin-top:0;}
+
+  /* bottom nav */
+  .navbar{
+    position:fixed;bottom:0;left:0;right:0;
+    max-width:480px;margin:0 auto;
+    background:#fff;border-top:1px solid var(--line);
+    display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  .navitem{touch-action:manipulation;-webkit-user-select:none;user-select:none;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 1px;border:none;background:none;color:var(--ink-soft);font-size:9.5px;font-weight:600;border-radius:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .navitem.active{color:var(--brand);background:var(--paid-bg);}
+  .navitem .ic{font-size:18px;}
+
+  /* fab */
+  .fab{
+    touch-action:manipulation;-webkit-user-select:none;user-select:none;
+    position:fixed;right:calc(50% - 240px + 18px);bottom:78px;
+    width:52px;height:52px;border-radius:50%;background:var(--brand);color:#fff;
+    border:none;font-size:26px;box-shadow:0 6px 16px rgba(18,75,68,.35);z-index:21;
+  }
+  @media (max-width:520px){ .fab{right:18px;} }
+
+  /* search */
+  .searchbar{display:flex;gap:8px;margin-bottom:10px;}
+  .searchbar input{flex:1;margin:0;}
+  .filterrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;}
+  .chip{flex-shrink:0;padding:6px 12px;border-radius:var(--radius-pill);border:1px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .chip.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+  /* overlay / modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,25,22,.45);z-index:30;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .sheet{
+    background:var(--paper);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+  .sheet-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .closebtn{border:none;background:var(--line);width:30px;height:30px;border-radius:50%;font-size:15px;color:var(--ink);}
+
+  .fullview{position:fixed;inset:0;background:var(--paper);z-index:25;max-width:480px;margin:0 auto;overflow-y:auto;}
+  .fv-header{background:var(--brand);color:#fff;padding:16px;display:flex;align-items:center;gap:10px;border-radius:0 0 18px 18px;}
+  .backbtn{border:none;background:rgba(255,255,255,.12);color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;}
+  .fv-body{padding:14px 16px calc(90px + env(safe-area-inset-bottom));}
+
+  .txn{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .txn:last-child{border-bottom:none;}
+  .txn .tl{color:var(--ink-soft);}
+
+  .toast{
+    position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:50;
+    max-width:85%;text-align:center;
+  }
+  .banner{background:var(--due-bg);color:var(--due);padding:10px 12px;border-radius:10px;font-size:12.5px;margin-bottom:12px;}
+  .loading{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--ink-soft);font-size:14px;}
+  a.wa-link{text-decoration:none;}
+  .helpline{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+
+  .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .feature-btn{min-height:46px;}
+  .loan-tag{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#EEF3F0;color:var(--ink-soft);display:inline-block;margin-left:4px;}
+  .day-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .day-row:last-child{border-bottom:none;}
+  .msg-preview{white-space:pre-line;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;line-height:1.45;}
+  .danger-note{background:var(--penalty-bg);color:var(--penalty);border-radius:10px;padding:9px;font-size:11.5px;}
+
+  .last15-card{padding:0;overflow:hidden;}
+  .last15-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:transparent;padding:14px 16px;color:var(--ink);font:700 17px Inter,system-ui,sans-serif;cursor:pointer;text-align:left;}
+  .last15-plus{font-size:25px;line-height:1;font-weight:500;color:var(--muted);}
+  .last15-body{display:none;padding:0 14px 12px;}
+  .last15-card.open .last15-body{display:block;}
+  .last15-card.open .last15-plus{transform:rotate(45deg);}
+  .last15-card .day-row{margin:0;border-top:1px solid rgba(20,70,63,.08);padding:11px 2px;}
+
+</style>
+<script src="xlsx.full.min.js" onerror="(function(){var x=document.createElement('script');x.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';document.head.appendChild(x);})()"></script>
+</head>
+<body>
+<div id="root" class="app"><div class="loading">Loading your ledger...</div></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================= STORAGE LAYER (IndexedDB) ============================= */
+var DB_NAME = "DailyCollectionDB";
+var STORE_NAME = "ledgers";
+var DB_VERSION = 1;
+var dbInstance = null;
+var usingFallback = false;
+var memoryFallback = null;
+
+function openDB(){
+  return new Promise(function(resolve, reject){
+    if (!window.indexedDB){
+      usingFallback = true;
+      return resolve(null);
+    }
+    var req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = function(){
+      usingFallback = true;
+      resolve(null);
+    };
+    req.onsuccess = function(e){
+      dbInstance = e.target.result;
+      resolve(dbInstance);
+    };
+    req.onupgradeneeded = function(e){
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)){
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
+}
+
+function defaultData(){
+  return {
+    customers: [],
+    transactions: {},
+    trash: [],
+    expenses: [],
+    expenseTrash: [],
+    settings: { 
+      penaltyPerDay: 0, 
+      countryCode: "91",
+      waPaidTemplate: "Payment received — thank you, {name}!\nAmount received: {amount}\nDate: {date}\nRemaining balance: {balance}\nRemaining days: {days}",
+      waDueTemplate: "Reminder for {name}:\nToday's due amount: {due}\nTotal amount due with penalties: {totalDue}\nPlease clear the pending amount at your earliest convenience.",
+      defaultCollectionNumber: ""
+    },
+    version: 5,
+    nextBookNo: 1
+  };
+}
+
+async function loadData(){
+  await openDB();
+  if (dbInstance && !usingFallback){
+    return new Promise(function(resolve){
+      try {
+        var tx = dbInstance.transaction(STORE_NAME, "readonly");
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.get("appdata");
+        req.onsuccess = function(){
+          if (req.result) {
+            var data = req.result;
+            if (!data.settings) data.settings = defaultData().settings;
+            if (!data.trash) data.trash = [];
+            if (!data.expenses) data.expenses = [];
+            if (!data.expenseTrash) data.expenseTrash = [];
+            if (!data.settings.waPaidTemplate) data.settings.waPaidTemplate = defaultData().settings.waPaidTemplate;
+            if (!data.settings.waDueTemplate) data.settings.waDueTemplate = defaultData().settings.waDueTemplate;
+            resolve(data);
+          } else {
+            resolve(defaultData());
+          }
+        };
+        req.onerror = function(){ resolve(defaultData()); };
+      } catch(err){
+        resolve(defaultData());
+      }
+    });
+  } else {
+    usingFallback = true;
+    if (!memoryFallback) memoryFallback = defaultData();
+    if (!memoryFallback.trash) memoryFallback.trash = [];
+    if (!memoryFallback.expenses) memoryFallback.expenses = [];
+    if (!memoryFallback.expenseTrash) memoryFallback.expenseTrash = [];
+    return memoryFallback;
+  }
+}
+
+async function saveData(data){
+  if (dbInstance && !usingFallback){
+    return new Promise(function(resolve){
+      try {
+        var tx = dbInstance.transaction(STORE_NAME, "readwrite");
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.put(data, "appdata");
+        tx.oncomplete = function(){ resolve(true); };
+        req.onerror = function(){ 
+          showToast("Storage error — check browser permissions");
+          resolve(false); 
+        };
+        tx.onerror = function(){ resolve(false); };
+        tx.onabort = function(){ resolve(false); };
+      } catch(e){
+        console.error("saveData failed:", e);
+        resolve(false);
+      }
+    });
+  } else {
+    memoryFallback = data;
+    return true;
+  }
+}
+
+/* ============================= APP STATE ============================= */
+var DATA = null;
+var VIEW = "home";
+var VIEW_PARAM = null;
+var CUSTOMER_FILTER = "all";
+var SEARCH_Q = "";
+var HISTORY_Q = "";
+var SAVING_LOCK = false;
+var MUTATION_LOCK = false;
+var MAX_MONEY_AMOUNT = 10000000; // ₹1 crore safety ceiling for accidental-entry protection
+
+function beginMutation(){ if (MUTATION_LOCK) return false; MUTATION_LOCK = true; return true; }
+function endMutation(){ MUTATION_LOCK = false; }
+function validMoneyAmount(n, allowZero){
+  var x = Number(n);
+  return isFinite(x) && x >= (allowZero ? 0 : 0.01) && x <= MAX_MONEY_AMOUNT;
+}
+var REPORTS_MONTH = todayISO().slice(0,7); 
+var CUSTOMER_LIST_LIMIT = 50; 
+var COLLECTION_MSG_TYPE = "full"; // "full" = poora summary, "simple" = sirf collected amount
+
+/* ============================= HELPERS ============================= */
+function uid(prefix){
+  return prefix + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,7);
+}
+function round2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+function inr(n){
+  n = round2(n||0);
+  return "₹" + n.toLocaleString("en-IN", {maximumFractionDigits:2, minimumFractionDigits: (n%1!==0)?2:0});
+}
+function todayISO(){
+  var d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function startOfDay(d){ var x = new Date(d); x.setHours(0,0,0,0); return x; }
+function fmtDate(iso){
+  if(!iso) return "—";
+  var d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+function dueDateForDay(customer, dayNumber){
+  if(!customer || !customer.startDate || !dayNumber) return "—";
+  var d = new Date(customer.startDate + "T00:00:00");
+  if(isNaN(d.getTime())) return "—";
+  d.setDate(d.getDate() + (Number(dayNumber) - 1));
+  return fmtDate(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"));
+}
+function fmtDateTime(ts){
+  var d = new Date(ts);
+  return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"}) + ", " + d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+}
+function escapeHtml(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function fmtTime(ts){
+  var d = new Date(ts);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+}
+function safeId(v){
+  return String(v == null ? "" : v).trim().replace(/[^A-Za-z0-9_\-]/g, "_");
+}
+function parseTs(v){
+  if (v === "" || v == null) return Date.now();
+  var t = new Date(v).getTime();
+  return isNaN(t) ? Date.now() : t;
+}
+function isReversedTxn(list, t){
+  if (!t || t.isCorrection) return false;
+  return (list || []).some(function(x){ return x.isCorrection && x.reversalForId === t.id; });
+}
+function openExternal(url){
+  if (window.AndroidBridge && window.AndroidBridge.openUrl){
+    try { window.AndroidBridge.openUrl(String(url)); return; } catch(e){}
+  }
+  window.location.href = url;
+}
+function saveFileCompat(filename, blob, doneMsg){
+  // Android app: WebView can't download blob: URLs, so hand the bytes to the native side.
+  if (window.AndroidBridge && window.AndroidBridge.saveFile){
+    var fr = new FileReader();
+    fr.onload = function(){
+      try {
+        var str = String(fr.result);
+        var b64 = str.slice(str.indexOf(",") + 1);
+        var ok = window.AndroidBridge.saveFile(filename, blob.type || "application/octet-stream", b64);
+        showToast(ok ? (doneMsg + " Saved in your Downloads folder.") : "Could not save the file. Please try again.");
+      } catch(e){ showToast("Could not save the file. Please try again."); }
+    };
+    fr.onerror = function(){ showToast("Could not save the file. Please try again."); };
+    fr.readAsDataURL(blob);
+    return;
+  }
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  showToast(doneMsg);
+}
+function cleanMobile(m, countryCode){
+  var digits = String(m||"").replace(/\D/g,"");
+  if (digits.length === 10) digits = (countryCode||"91") + digits;
+  return digits;
+}
+function validateMobile(m){
+  var digits = String(m||"").replace(/\D/g,"");
+  return /^\d{10}$/.test(digits);
+}
+function sanitizeDateStr(s, fallback){
+  // Guards against corrupted/malformed dates from an imported file (bad Excel
+  // cell, hand-edited backup, etc.) turning into "Invalid Date" / NaN day
+  // counts throughout computeStats(). Falls back to today's date when the
+  // value isn't a real, parseable calendar date.
+  if (typeof s === "number" && isFinite(s) && s > 20000 && s < 80000){
+    // Excel stores real date cells as serial numbers
+    var ex = new Date(Date.UTC(1899, 11, 30) + Math.round(s) * 86400000);
+    return ex.getUTCFullYear() + "-" + String(ex.getUTCMonth()+1).padStart(2,"0") + "-" + String(ex.getUTCDate()).padStart(2,"0");
+  }
+  var str = String(s || "").trim();
+  var m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m2){
+    var d = new Date(str.slice(0,10) + "T00:00:00");
+    if (!isNaN(d.getTime())) return str.slice(0,10);
+  }
+  return fallback;
+}
+
+/* ============================= BUSINESS LOGIC ============================= */
+function twentyPercentCut(principal){
+  return round2(principal * 0.20);
+}
+
+function isFivePlan(customer){
+  return Number(customer.principal) === 5000 && Number(customer.period) === 30;
+}
+
+function computeStats(customer, txns, settings){
+  txns = txns || [];
+  var start = startOfDay(new Date(customer.startDate + "T00:00:00"));
+  var today = startOfDay(new Date());
+  var diffDays = Math.floor((today - start) / 86400000);
+  var hasStarted = diffDays >= 0;
+  var currentDayNumber = Math.min(Math.max(diffDays + 1, 1), customer.period);
+
+  // Sum how much has actually been collected for each day number. A
+  // correction/undo entry carries a negative amountPaid on the same
+  // dayNumber it reverses, so summing naturally undoes it (partially or
+  // fully) without any separate delete-from-set step.
+  var dayCollected = {};
+  txns.forEach(function(t){
+    dayCollected[t.dayNumber] = round2((dayCollected[t.dayNumber] || 0) + (t.amountPaid || 0));
+  });
+
+  // A day only counts as fully settled once its full daily amount has been
+  // collected for it — a partial payment leaves the shortfall pending
+  // instead of quietly marking the whole day as done. (0.004 guards against
+  // floating-point rounding dust, e.g. 3 x 33.33 landing at 99.99.)
+  var paidSet = {};
+  Object.keys(dayCollected).forEach(function(dayNum){
+    if (dayCollected[dayNum] + 0.004 >= customer.dailyAmount) paidSet[dayNum] = true;
+  });
+
+  var totalCollected = round2(txns.reduce(function(s,t){ 
+    return s + (t.amountPaid||0); 
+  }, 0));
+
+  var totalPenaltyPaid = round2(txns.reduce(function(s,t){ return s + (t.penaltyPaid||0); }, 0));
+  var paidDaysCount = Object.keys(paidSet).length;
+
+  var pendingDayNumbers = [];
+  var pendingDayShortfall = {}; // dayNumber -> amount still owed for that specific day
+  if (hasStarted){
+    for (var d=1; d<=currentDayNumber; d++){
+      if (!paidSet[d]){
+        pendingDayNumbers.push(d);
+        pendingDayShortfall[d] = Math.max(0, round2(customer.dailyAmount - (dayCollected[d] || 0)));
+      }
+    }
+  }
+  var lateDayNumbers = pendingDayNumbers.filter(function(d){ return d < currentDayNumber; });
+  var lateDays = lateDayNumbers.length;
+  var todaysDue = pendingDayNumbers.indexOf(currentDayNumber) !== -1;
+
+  var backlogAmount = round2(lateDayNumbers.reduce(function(sum, d){ return sum + pendingDayShortfall[d]; }, 0));
+  var todaysDueAmount = round2((todaysDue ? pendingDayShortfall[currentDayNumber] : 0) + backlogAmount);
+  // Per-customer penalty rate wins if the customer has one set; otherwise fall back to the global settings rate.
+  var effectivePenaltyRate = (customer.penaltyPerDay != null && customer.penaltyPerDay !== "")
+    ? Number(customer.penaltyPerDay) : (settings.penaltyPerDay || 0);
+  var penaltyDue = round2(lateDays * effectivePenaltyRate);
+  var totalPending = Math.max(0, round2(customer.principal - totalCollected));
+  var totalOutstanding = round2(totalPending + penaltyDue);
+  var remainingDays = Math.max(0, customer.period - paidDaysCount);
+  var daysAfterToday = Math.max(0, customer.period - currentDayNumber);
+  var futureScheduled = round2(daysAfterToday * customer.dailyAmount);
+  var isCompleted = paidDaysCount >= customer.period;
+
+  return {
+    hasStarted: hasStarted,
+    currentDayNumber: currentDayNumber,
+    paidSet: paidSet,
+    pendingDayNumbers: pendingDayNumbers,
+    pendingDayShortfall: pendingDayShortfall,
+    paidDaysCount: paidDaysCount,
+    totalCollected: totalCollected,
+    totalPenaltyPaid: totalPenaltyPaid,
+    lateDays: lateDays,
+    todaysDue: todaysDue,
+    todaysDueAmount: todaysDueAmount,
+    backlogAmount: backlogAmount,
+    penaltyDue: penaltyDue,
+    effectivePenaltyRate: effectivePenaltyRate,
+    totalPending: totalPending,
+    totalOutstanding: totalOutstanding,
+    remainingDays: remainingDays,
+    futureScheduled: futureScheduled,
+    isCompleted: isCompleted
+  };
+}
+
+function activeCustomers(){
+  return DATA.customers.filter(function(c){ return c.archived !== true; });
+}
+
+/* ============================= EXPENSE DIARY ============================= */
+async function addExpense(name, amount){
+  if (!beginMutation()) return null;
+  try{
+    var n = round2(Number(amount));
+    if (!String(name||"").trim() || !validMoneyAmount(n, false)){
+      showToast("Enter a valid expense amount (up to ₹1 crore).");
+      return null;
+    }
+    if (!DATA.expenses) DATA.expenses = [];
+    var e = { id: uid("exp"), name: name.trim(), amount: n, date: todayISO(), timestamp: Date.now() };
+    DATA.expenses.push(e);
+    var saved = await saveData(DATA);
+    if (!saved){ DATA.expenses.pop(); return null; }
+    return e;
+  } finally { endMutation(); }
+}
+
+async function deleteExpense(id){
+  if (!DATA.expenses) return;
+  var idx = DATA.expenses.findIndex(function(e){ return e.id === id; });
+  if (idx === -1) return;
+  var removed = DATA.expenses.splice(idx, 1)[0];
+  if (!DATA.expenseTrash) DATA.expenseTrash = [];
+  DATA.expenseTrash.push({ expense: removed, deletedAt: Date.now() });
+  await saveData(DATA);
+}
+
+async function restoreExpense(index){
+  if (!DATA.expenseTrash || !DATA.expenseTrash[index]) return;
+  var item = DATA.expenseTrash.splice(index, 1)[0];
+  if (!DATA.expenses) DATA.expenses = [];
+  DATA.expenses.push(item.expense);
+  await saveData(DATA);
+}
+
+async function deleteExpensePermanently(index){
+  if (!DATA.expenseTrash || !DATA.expenseTrash[index]) return;
+  DATA.expenseTrash.splice(index, 1);
+  await saveData(DATA);
+}
+
+/* ============================= MUTATIONS ============================= */
+function normalizePenaltyOverride(v){
+  // "" / null / undefined means "use the global default rate from Settings".
+  if (v === "" || v === null || v === undefined) return null;
+  var n = parseFloat(v);
+  return (isNaN(n) || n < 0) ? null : round2(n);
+}
+
+async function addCustomer(payload){
+  if (!beginMutation()) return null;
+  try{
+    var principal = round2(Number(payload.principal));
+    var daily = round2(Number(payload.dailyAmount));
+    if (!String(payload.name||"").trim() || !validateMobile(payload.mobile) || !validMoneyAmount(principal,false) || !validMoneyAmount(daily,false)){
+      showToast("Please enter valid customer details and amounts (maximum ₹1 crore).");
+      return null;
+    }
+    var c = {
+      id: uid("cust"),
+      personId: payload.personId || ('person_' + String(payload.mobile||'').replace(/\D/g,'') + '_' + Date.now()),
+      bookId: uid("book"),
+      bookNo: nextBookNumber ? nextBookNumber() : ('BOOK-' + Date.now()),
+      bookTitle: payload.bookTitle || 'Loan / Book',
+      name: payload.name.trim(), mobile: payload.mobile.trim(), principal: principal,
+      startDate: sanitizeDateStr(payload.startDate, todayISO()),
+      period: Math.max(1, Math.round(payload.period) || 1), dailyAmount: daily,
+      penaltyPerDay: normalizePenaltyOverride(payload.penaltyPerDay), notes: payload.notes ? payload.notes.trim() : "",
+      status: "active", archived: false, createdAt: Date.now()
+    };
+    DATA.customers.push(c); DATA.transactions[c.id] = [];
+    var saved = await saveData(DATA);
+    if (!saved){ DATA.customers.pop(); delete DATA.transactions[c.id]; return null; }
+    return c;
+  } finally { endMutation(); }
+}
+
+async function updateCustomer(id, payload){
+  var c = DATA.customers.find(function(x){ return x.id === id; });
+  if (!c) return false;
+  if (!validMoneyAmount(payload.dailyAmount, false) || (payload.principal !== undefined && !validMoneyAmount(payload.principal, false))){
+    showToast("Please enter valid amounts (maximum ₹1 crore).");
+    return false;
+  }
+  c.name = payload.name.trim();
+  c.mobile = payload.mobile.trim();
+  c.dailyAmount = Math.max(0, round2(payload.dailyAmount) || 0);
+  c.notes = payload.notes ? payload.notes.trim() : "";
+  if (payload.principal !== undefined) c.principal = Math.max(0, round2(payload.principal) || 0);
+  if (payload.period !== undefined) c.period = Math.max(1, Math.round(payload.period) || 1);
+  if (payload.startDate) c.startDate = sanitizeDateStr(payload.startDate, c.startDate);
+  if (payload.penaltyPerDay !== undefined) c.penaltyPerDay = normalizePenaltyOverride(payload.penaltyPerDay);
+  await saveData(DATA);
+  return true;
+}
+
+async function archiveCustomer(id, archived){
+  if (!beginMutation()) return false;
+  try{
+    var c = DATA.customers.find(function(x){ return x.id === id; });
+    if (!c) return false;
+    var old = c.archived; c.archived = archived;
+    var saved = await saveData(DATA);
+    if (!saved) c.archived = old;
+    return !!saved;
+  } finally { endMutation(); }
+}
+
+async function moveToTrash(customerId){
+  var idx = DATA.customers.findIndex(function(x){ return x.id === customerId; });
+  if (idx === -1) return {ok:false, reason:"not_found"};
+  var removed = DATA.customers.splice(idx, 1)[0];
+  if (!DATA.trash) DATA.trash = [];
+  DATA.trash.push({
+    customer: removed,
+    transactions: DATA.transactions[customerId] || [],
+    deletedAt: Date.now()
+  });
+  delete DATA.transactions[customerId];
+  var saved = await saveData(DATA);
+  if (!saved){
+    // Roll back in-memory changes if persistence failed.
+    DATA.trash.pop();
+    DATA.customers.splice(idx, 0, removed);
+    DATA.transactions[customerId] = DATA.transactions[customerId] || [];
+    return {ok:false, reason:"save_failed"};
+  }
+  return {ok:true};
+}
+
+async function restoreFromTrash(index){
+  if (!DATA.trash || !DATA.trash[index]) return {ok:false, reason:"not_found"};
+  var item = DATA.trash.splice(index, 1)[0];
+  DATA.customers.push(item.customer);
+  DATA.transactions[item.customer.id] = item.transactions || [];
+  var saved = await saveData(DATA);
+  if (!saved){
+    DATA.customers = DATA.customers.filter(function(c){ return c.id !== item.customer.id; });
+    delete DATA.transactions[item.customer.id];
+    DATA.trash.splice(index, 0, item);
+    return {ok:false, reason:"save_failed"};
+  }
+  return {ok:true};
+}
+
+async function deletePermanently(index){
+  if (!DATA.trash || !DATA.trash[index]) return {ok:false, reason:"not_found"};
+  var removed = DATA.trash.splice(index, 1)[0];
+  var saved = await saveData(DATA);
+  if (!saved){
+    DATA.trash.splice(index, 0, removed);
+    return {ok:false, reason:"save_failed"};
+  }
+  return {ok:true};
+}
+
+async function markPaid(customerId, amountReceived, penaltyReceived){
+  if (SAVING_LOCK) return {ok:false};
+  SAVING_LOCK = true;
+  try{
+    var c = DATA.customers.find(function(x){ return x.id === customerId; });
+    if (!c) return {ok:false};
+    var txns = DATA.transactions[c.id] || (DATA.transactions[c.id] = []);
+    var s = computeStats(c, txns, DATA.settings);
+
+    if (!s.pendingDayNumbers.length && s.isCompleted){
+      showToast("Nothing pending to mark paid for " + c.name + " — plan is already completed.");
+      return {ok:false};
+    }
+
+    var remaining = round2(amountReceived) || 0;
+    var penaltyIn = round2(penaltyReceived || 0);
+    var penaltyOnly = (remaining <= 0 && penaltyIn > 0);
+    if (!validMoneyAmount(remaining, penaltyOnly) || !validMoneyAmount(penaltyIn, true)){
+      showToast("Amount is outside the allowed safety range (maximum ₹1 crore).");
+      return {ok:false};
+    }
+    if (!penaltyOnly && (!remaining || remaining <= 0)){
+      showToast("Enter an amount greater than zero.");
+      return {ok:false};
+    }
+    var startLen = txns.length;
+
+    // Fresh day -> collected map covering the WHOLE plan (not just up to
+    // today), so that if the amount received is more than what's due, the
+    // extra rolls forward into future days as an advance instead of being
+    // silently dropped.
+    var dayCollected = {};
+    txns.forEach(function(t){
+      dayCollected[t.dayNumber] = round2((dayCollected[t.dayNumber] || 0) + (t.amountPaid || 0));
+    });
+
+    var candidateDays = s.pendingDayNumbers.slice();
+    for (var d = s.currentDayNumber + 1; d <= c.period; d++){ candidateDays.push(d); }
+
+    var settledDays = [];
+    var advanceDays = [];
+    var createdTxns = [];
+    for (var i=0; i<candidateDays.length && remaining > 0; i++){
+      var dayNum = candidateDays[i];
+      var collectedSoFar = dayCollected[dayNum] || 0;
+      var owed = Math.max(0, round2(c.dailyAmount - collectedSoFar));
+      if (owed <= 0) continue;
+      var portion = round2(Math.min(remaining, owed));
+      if (portion <= 0) continue;
+      remaining = round2(remaining - portion);
+      dayCollected[dayNum] = round2(collectedSoFar + portion);
+      var isAdvance = dayNum > s.currentDayNumber;
+      var tx = {
+        id: uid("txn"),
+        dayNumber: dayNum,
+        amountPaid: portion,
+        penaltyPaid: 0,
+        date: todayISO(),
+        timestamp: Date.now()
+      };
+      // Keep the existing allocation rules intact, but make the payment type
+      // explicit in history so late and partial payments remain easy to audit.
+      // A payment can be both late and partial.
+      var isPartial = (portion + 0.004 < owed);
+      var isLate = dayNum < s.currentDayNumber;
+      if (isAdvance) {
+        tx.note = "Advance payment";
+      } else if (isLate && isPartial) {
+        tx.note = "Late + partial payment";
+      } else if (isLate) {
+        tx.note = "Late payment";
+      } else if (isPartial) {
+        tx.note = "Partial payment";
+      }
+      txns.push(tx);
+      createdTxns.push(tx);
+      settledDays.push(dayNum);
+      if (isAdvance) advanceDays.push(dayNum);
+    }
+
+    if (penaltyReceived && penaltyReceived > 0){
+      if (createdTxns.length){
+        createdTxns[createdTxns.length-1].penaltyPaid = round2(penaltyReceived);
+      } else {
+        // No day left to attach it to (plan fully paid up) — still record the penalty on its own.
+        txns.push({
+          id: uid("txn"), dayNumber: s.currentDayNumber, amountPaid: 0,
+          penaltyPaid: round2(penaltyReceived), date: todayISO(), timestamp: Date.now()
+        });
+        createdTxns.push(true);
+      }
+    }
+
+    if (!createdTxns.length){
+      showToast("Nothing to record — " + c.name + "'s plan is already fully paid up.");
+      return {ok:false};
+    }
+
+    var savedPay = await saveData(DATA);
+    if (!savedPay){
+      txns.splice(startLen);
+      return {ok:false};
+    }
+    return {ok:true, settledDays: settledDays, advanceDays: advanceDays, leftoverAdvance: remaining};
+  } finally {
+    SAVING_LOCK = false;
+  }
+}
+
+/* ============================= SEND REMINDERS (BULK) ============================= */
+function openRemindersModal(){
+  var pendingList = [];
+  activeCustomers().forEach(function(c){
+    var txns = DATA.transactions[c.id] || [];
+    var s = computeStats(c, txns, DATA.settings);
+    if (s.hasStarted && !s.isCompleted && s.todaysDue){
+      pendingList.push({c:c, s:s});
+    }
+  });
+  pendingList.sort(function(a,b){
+    if (b.s.lateDays !== a.s.lateDays) return b.s.lateDays - a.s.lateDays;
+    return a.c.name.localeCompare(b.c.name);
+  });
+
+  var rowsHtml = pendingList.length ? pendingList.map(function(r){
+    var total = round2(r.s.todaysDueAmount + r.s.penaltyDue);
+    return (
+      '<div class="crow" style="padding:9px 0;border-bottom:1px solid var(--line);">' +
+        '<div><div class="name">' + escapeHtml(r.c.name) + '</div>' +
+        '<div class="sub">' + escapeHtml(r.c.mobile) + ' · Due ' + inr(total) + (r.s.lateDays ? ' · ' + r.s.lateDays + ' day(s) late' : '') + '</div></div>' +
+        '<a class="wa-link" href="' + waLink(r.c.mobile, waDueMessage(r.c, r.s)) + '" target="_self" rel="noopener">' +
+          '<button class="btn btn-wa-due btn-small">📨 Remind</button></a>' +
+      '</div>'
+    );
+  }).join("") : '<div class="empty">Nothing pending — no reminders to send.</div>';
+
+  var wrap = document.createElement("div");
+  wrap.className = "overlay";
+  wrap.id = "remindOverlay";
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button class="closebtn" data-close-remind="1" style="font-size:14px;">←</button>' +
+          '<h2>Send Reminders (' + pendingList.length + ')</h2>' +
+        '</div>' +
+        '<button class="closebtn" data-close-remind="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' + rowsHtml + '</div>' +
+    '</div>'
+  );
+  document.body.appendChild(wrap);
+
+  try { history.pushState({view: VIEW, param: VIEW_PARAM}, "", ""); } catch(e){}
+  REMIND_MODAL_OPEN = true;
+
+  function dismissModal(){
+    if (!wrap.isConnected) return;
+    wrap.remove();
+    if (REMIND_MODAL_OPEN){
+      REMIND_MODAL_OPEN = false;
+      try { history.back(); } catch(e){}
+    }
+  }
+
+  wrap.addEventListener("click", function(e){
+    if (e.target.id === "remindOverlay" || e.target.hasAttribute("data-close-remind")) dismissModal();
+  });
+}
+
+
+function markTransactionUnpaid(customerId, txnId){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  var txns = DATA.transactions[customerId] || [];
+  var target = txns.find(function(t){ return t.id === txnId; });
+  if (!c || !target){ showToast("Transaction not found — it may have been moved or deleted."); return; }
+  if (isReversedTxn(txns, target)){ showToast("This payment is already marked unpaid."); return; }
+
+  var wrap = document.createElement("div");
+  wrap.className = "overlay";
+  wrap.id = "unpaidConfirmOverlay";
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<h2>Mark Unpaid?</h2>' +
+        '<button class="closebtn" data-close-unpaid-confirm="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="sub">Day ' + target.dayNumber + ' — ' + inr(target.amountPaid) +
+        (target.penaltyPaid ? " + " + inr(target.penaltyPaid) + " penalty" : "") +
+        ' will be reversed. The original entry stays in history for the record.</div>' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-outline" data-close-unpaid-confirm="1">Cancel</button>' +
+          '<button class="btn btn-danger" id="confirmUnpaidBtn">Yes, Mark Unpaid</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+  document.body.appendChild(wrap);
+
+  try { history.pushState({view: VIEW, param: VIEW_PARAM}, "", ""); } catch(e){}
+  UNPAID_CONFIRM_OPEN = true;
+
+  function dismissModal(){
+    if (!wrap.isConnected) return;
+    wrap.remove();
+    if (UNPAID_CONFIRM_OPEN){
+      UNPAID_CONFIRM_OPEN = false;
+      try { history.back(); } catch(e){}
+    }
+  }
+
+  wrap.addEventListener("click", function(e){
+    if (e.target.id === "unpaidConfirmOverlay" || e.target.hasAttribute("data-close-unpaid-confirm")) dismissModal();
+  });
+
+  document.getElementById("confirmUnpaidBtn").addEventListener("click", async function(){
+    var btn = this;
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    var res = await undoOrCorrectTransaction(customerId, txnId, "Marked Unpaid");
+    dismissModal();
+    if (res.ok){
+      showToast("Marked as unpaid.");
+    } else {
+      showToast("Could not update. Please try again.");
+    }
+    render();
+  });
+}
+
+async function undoOrCorrectTransaction(customerId, txnId, correctionNote){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  if (!c) return {ok:false};
+  var txns = DATA.transactions[customerId] || [];
+  var target = txns.find(function(t){ return t.id === txnId; });
+  if (!target) return {ok:false};
+  if (isReversedTxn(txns, target)) return {ok:false, reason:"already_reversed"};
+
+  var correctionTx = {
+    id: uid("txn_corr"),
+    dayNumber: target.dayNumber,
+    amountPaid: round2(-target.amountPaid),
+    penaltyPaid: round2(-(target.penaltyPaid || 0)),
+    date: todayISO(),
+    timestamp: Date.now(),
+    isCorrection: true,
+    reversalForId: target.id,
+    reversedDayNumber: target.dayNumber,
+    note: correctionNote || "Correction / Undo entry"
+  };
+  
+  txns.push(correctionTx);
+  var savedCorr = await saveData(DATA);
+  if (!savedCorr){ txns.pop(); return {ok:false}; }
+  return {ok:true};
+}
+
+async function saveSettings(newSettings){
+  DATA.settings = Object.assign({}, DATA.settings, newSettings);
+  await saveData(DATA);
+}
+
+/* ============================= WHATSAPP ============================= */
+function waLink(mobile, message){
+  var digits = String(mobile||"").replace(/\D/g,"");
+  if (!/^\d{10}$/.test(digits)){
+    return "#wa-invalid";
+  }
+  var num = cleanMobile(digits, DATA.settings.countryCode);
+  return "https://wa.me/" + num + "?text=" + encodeURIComponent(message);
+}
+
+function formatWaTemplate(template, data){
+  var text = template || "";
+  for (var key in data){
+    text = text.replace(new RegExp("\\{" + key + "\\}", "g"), function(){ return String(data[key]); });
+  }
+  return text;
+}
+
+function waPaidMessage(c, stats, agg){
+  var data = {
+    name: c.name,
+    amount: inr(agg ? agg.amountPaid : 0),
+    date: fmtDate(todayISO()),
+    balance: inr(stats.totalOutstanding),
+    days: stats.remainingDays,
+    penalty: inr(agg ? agg.penaltyPaid || 0 : 0)
+  };
+  var template = DATA.settings.waPaidTemplate || defaultData().settings.waPaidTemplate;
+  return formatWaTemplate(template, data);
+}
+
+function waDueMessage(c, stats){
+  var totalDueWithPenalty = round2(stats.todaysDueAmount + stats.penaltyDue);
+  var data = {
+    name: c.name,
+    due: inr(stats.todaysDueAmount),
+    lateDays: stats.lateDays,
+    penalty: inr(stats.penaltyDue),
+    totalDue: inr(totalDueWithPenalty)
+  };
+  var template = DATA.settings.waDueTemplate || defaultData().settings.waDueTemplate;
+  return formatWaTemplate(template, data);
+}
+
+function expenseWaMessage(){
+  var list = DATA.expenses || [];
+  var todayList = list.filter(function(e){ return e.date === todayISO(); });
+  var todayTotal = round2(todayList.reduce(function(s,e){ return s + e.amount; }, 0));
+  var overallTotal = round2(list.reduce(function(s,e){ return s + e.amount; }, 0));
+
+  var lines = ["Expense Summary — " + fmtDate(todayISO())];
+  if (todayList.length){
+    todayList.forEach(function(e){ lines.push("• " + e.name + ": " + inr(e.amount)); });
+  } else {
+    lines.push("No expenses recorded today.");
+  }
+  lines.push("Today's Total: " + inr(todayTotal));
+  lines.push("Overall Total: " + inr(overallTotal));
+  return lines.join("\n");
+}
+
+async function copyTextToClipboard(text){
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch(e){ /* fall through to legacy method */ }
+  try {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    var ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch(e){
+    return false;
+  }
+}
+
+async function maybeSaveCollectionDefaultNumber(num){
+  var checkbox = document.getElementById("collSaveDefault");
+  if (checkbox && checkbox.checked && validateMobile(num)){
+    await saveSettings({ defaultCollectionNumber: num.trim() });
+  }
+}
+
+function collectionWaMessage(){
+  var t = todayTotals();
+  var lines = [
+    "Today's Collection Summary — " + fmtDate(todayISO()),
+    "Customers Due Today: " + t.customersDueToday,
+    "Total Due: " + inr(t.totalDueToday),
+    "Collected: " + inr(t.totalCollected),
+    "Pending: " + inr(t.totalPendingToday),
+    "Penalty: " + inr(t.totalPenaltyToday),
+    "Collection %: " + t.collectionPercent + "%"
+  ];
+  return lines.join("\n");
+}
+
+function simpleCollectionMessage(){
+  var t = todayTotals();
+  var lines = [
+    "Aaj Ka Collection — " + fmtDate(todayISO()),
+    "Total Collected: " + inr(t.totalCollected)
+  ];
+  return lines.join("\n");
+}
+
+function getSelectedCollectionMessage(){
+  return COLLECTION_MSG_TYPE === "simple" ? simpleCollectionMessage() : collectionWaMessage();
+}
+
+/* ============================= TOAST ============================= */
+var toastTimer = null;
+function showToast(msg){
+  var existing = document.getElementById("toastEl");
+  if (existing) existing.remove();
+  var el = document.createElement("div");
+  el.id = "toastEl";
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.remove(); }, 2400);
+}
+
+/* ============================= ROBUST ROUTER & UNIVERSAL BACK SUPPORT ============================= */
+var PAY_MODAL_OPEN = false; // tracks the Mark-as-Paid modal, which lives outside #root
+var REMIND_MODAL_OPEN = false; // tracks the Send Reminders modal, which lives outside #root
+var UNPAID_CONFIRM_OPEN = false; // tracks the Mark Unpaid confirmation modal, which lives outside #root
+
+function closeAnyStrayModal(){
+  // Safety net: if a modal element is still in the DOM (e.g. after a render()
+  // triggered elsewhere while it was open), remove it so it never gets stuck
+  // on screen. #root's own overlays are cleared automatically by render().
+  var pay = document.getElementById("payOverlay");
+  if (pay){ pay.remove(); }
+  PAY_MODAL_OPEN = false;
+  var remind = document.getElementById("remindOverlay");
+  if (remind){ remind.remove(); }
+  REMIND_MODAL_OPEN = false;
+  var unpaidConfirm = document.getElementById("unpaidConfirmOverlay");
+  if (unpaidConfirm){ unpaidConfirm.remove(); }
+  UNPAID_CONFIRM_OPEN = false;
+  var duePayment = document.getElementById("duePaymentOverlay");
+  if (duePayment){ duePayment.remove(); }
+}
+
+function setView(view, param, pushHistory = true){
+  closeAnyStrayModal();
+  VIEW = view; VIEW_PARAM = param;
+  if (pushHistory) {
+    try {
+      history.pushState({view: view, param: param}, "", "");
+    } catch(e){}
+  }
+  render();
+  window.scrollTo(0,0);
+}
+
+window.addEventListener("popstate", function(e){
+  // If the Mark-as-Paid modal is open, the hardware/browser back button
+  // should just close it (it lives outside #root, so a plain render()
+  // would never remove it on its own).
+  closeAnyStrayModal();
+  if (e.state) {
+    VIEW = e.state.view || "home";
+    VIEW_PARAM = e.state.param || null;
+  } else {
+    VIEW = "home";
+    VIEW_PARAM = null;
+  }
+  render();
+  window.scrollTo(0,0);
+});
+
+function render(){
+  var root = document.getElementById("root");
+  try {
+    var html = "";
+    html += renderTopbar();
+    html += '<div class="content">' + renderView() + '</div>';
+    html += renderNav();
+
+    if (VIEW === "customerDetail" && VIEW_PARAM){
+      root.innerHTML = html;
+      renderCustomerDetailOverlay(VIEW_PARAM);
+    } else if (VIEW === "addCustomer"){
+      root.innerHTML = html;
+      renderAddCustomerOverlay();
+    } else if (VIEW === "editCustomer" && VIEW_PARAM){
+      root.innerHTML = html;
+      renderEditCustomerOverlay(VIEW_PARAM);
+    } else {
+      root.innerHTML = html;
+    }
+    attachGlobalHandlers();
+  } catch(err){
+    // Defensive fallback: one bad record (e.g. from a hand-edited backup)
+    // should never freeze the whole app on a blank/broken screen. Drop back
+    // to Home, which only needs the basics every customer record has.
+    console.error("Render error, falling back to Home:", err);
+    if (VIEW !== "home"){
+      VIEW = "home"; VIEW_PARAM = null;
+      try { render(); return; } catch(e2){ /* fall through to hard message below */ }
+    }
+    if (root) root.innerHTML = '<div class="loading">Something went wrong showing this screen. Try reloading the page.</div>';
+  }
+}
+
+function renderTopbar(){
+  var stats = todayTotals();
+  return (
+    '<div class="topbar">' +
+      '<div class="topbar-row">' +
+        '<div><h1>Shailu Bhai</h1><div class="date">' + fmtDate(todayISO()) + (usingFallback ? " · session storage" : " · IndexedDB secure") + '</div></div>' +
+      '</div>' +
+      '<div class="topbar-stats">' +
+        '<div class="tstat"><div class="lbl">Due Today</div><div class="val">' + inr(stats.totalDueToday) + '</div></div>' +
+        '<div class="tstat"><div class="lbl">Collected</div><div class="val">' + inr(stats.totalCollected) + '</div></div>' +
+        '<div class="tstat"><div class="lbl">Pending</div><div class="val">' + inr(stats.totalPendingToday) + '</div></div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function renderNav(){
+  function item(v, icon, label){
+    var active = (VIEW === v || (VIEW==="customerDetail" && v==="customers") || (VIEW==="addCustomer" && v==="customers") || (VIEW==="editCustomer" && v==="customers")) ? " active" : "";
+    return '<button class="navitem' + active + '" data-nav="' + v + '"><span class="ic">' + icon + '</span>' + label + '</button>';
+  }
+  return (
+    '<div class="navbar">' +
+      item("home","🏠","Home") +
+      item("customers","👥","Customers") +
+      item("history","📚","History") +
+      item("trash","🗑️","Trash") +
+      item("reports","📊","Reports") +
+      item("settings","⚙️","Settings") +
+    '</div>' +
+    ((VIEW==="home"||VIEW==="customers") ? '<button class="fab" data-nav="addCustomer">+</button>' : '')
+  );
+}
+
+function renderView(){
+  if (VIEW === "home") return renderHome();
+  if (VIEW === "customers") return renderCustomers();
+  if (VIEW === "history") return renderHistory();
+  if (VIEW === "expenses") return renderExpenses();
+  if (VIEW === "trash") return renderTrash();
+  if (VIEW === "reports") return renderReports();
+  if (VIEW === "settings") return renderSettings();
+  return renderHome();
+}
+
+/* ---------- totals ---------- */
+function todayTotals(){
+  var totalCollectedToday=0, totalPenaltyCollectedToday=0, totalPendingToday=0, totalPenaltyLiveToday=0, customersDueToday=0;
+  var totalPrincipal=0, totalCollectedAll=0, totalPendingAll=0, totalPenaltyAll=0;
+  activeCustomers().forEach(function(c){
+    var txns = DATA.transactions[c.id] || [];
+    var s = computeStats(c, txns, DATA.settings);
+    totalPrincipal += c.principal;
+    totalCollectedAll += s.totalCollected;
+    totalPendingAll += s.totalPending;
+    totalPenaltyAll += s.penaltyDue;
+
+    if (s.hasStarted && !s.isCompleted){
+      customersDueToday++;
+      if (s.todaysDue){
+        totalPendingToday += round2(s.todaysDueAmount);
+        totalPenaltyLiveToday += s.penaltyDue;
+      }
+    }
+    var todaysTxns = txns.filter(function(t){ return t.date === todayISO(); });
+    var netAmountToday = round2(todaysTxns.reduce(function(sum,t){ return sum + t.amountPaid; }, 0));
+    var netPenaltyToday = round2(todaysTxns.reduce(function(sum,t){ return sum + (t.penaltyPaid||0); }, 0));
+    if (netAmountToday > 0.004){
+      totalCollectedToday += netAmountToday;
+      totalPenaltyCollectedToday += netPenaltyToday;
+    }
+  });
+  var totalDueToday = round2(totalCollectedToday + totalPendingToday);
+  var totalPenaltyToday = round2(totalPenaltyLiveToday + totalPenaltyCollectedToday);
+  var collectionPercent = totalDueToday > 0 ? round2((totalCollectedToday/totalDueToday)*100) : (totalCollectedToday>0 ? 100 : 0);
+  return {
+    customersDueToday: customersDueToday,
+    totalDueToday: round2(totalDueToday),
+    totalCollected: round2(totalCollectedToday),
+    totalPendingToday: round2(totalPendingToday),
+    totalPenaltyToday: totalPenaltyToday,
+    collectionPercent: collectionPercent,
+    totalPrincipal: round2(totalPrincipal), totalCollectedAll: round2(totalCollectedAll),
+    totalPendingAll: round2(totalPendingAll), totalPenaltyAll: round2(totalPenaltyAll),
+    totalOutstandingAll: round2(totalPendingAll + totalPenaltyAll)
+  };
+}
+
+/* ---------- Home ---------- */
+function renderHome(){
+  var t = todayTotals();
+  var count = activeCustomers().length;
+  var defaultCollNum = (DATA.settings && DATA.settings.defaultCollectionNumber) || "";
+  var html = "";
+
+  html += '<div class="card" style="background:var(--brand);color:#fff;border:none;">' +
+    '<div style="font-size:11.5px;color:#BFE0D8;text-transform:uppercase;letter-spacing:.05em;">Today\'s Collection</div>' +
+    '<div style="font-family:\'Fraunces\',serif;font-size:30px;font-weight:700;margin-top:3px;color:#fff;">' + inr(t.totalDueToday) + '</div>' +
+    '<div class="grid2" style="margin-top:14px;">' +
+      '<div><div style="font-size:11px;color:#BFE0D8;">Collected</div><div style="font-weight:700;font-size:16px;">' + inr(t.totalCollected) + '</div></div>' +
+      '<div><div style="font-size:11px;color:#BFE0D8;">Pending</div><div style="font-weight:700;font-size:16px;">' + inr(t.totalPendingToday) + '</div></div>' +
+      '<div><div style="font-size:11px;color:#BFE0D8;">Penalty</div><div style="font-weight:700;font-size:16px;">' + inr(t.totalPenaltyToday) + '</div></div>' +
+      '<div><div style="font-size:11px;color:#BFE0D8;">Collection %</div><div style="font-weight:700;font-size:16px;">' + t.collectionPercent + '%</div></div>' +
+    '</div>' +
+  '</div>';
+
+  html += '<div class="grid2">';
+  html += statCard("Customers Due Today", t.customersDueToday);
+  html += statCard("Total Customers", count);
+  html += '</div>';
+
+  html += '<div class="section-title">Quick Actions</div>';
+  html += '<div class="card">' +
+    '<div class="btnrow">' +
+      '<button class="btn btn-primary" data-nav="addCustomer">➕ Add Customer</button>' +
+      '<button class="btn btn-outline" data-nav="customers">🔍 Search</button>' +
+    '</div>' +
+    '<div class="btnrow">' +
+      '<button class="btn btn-outline" data-nav="history">📚 History</button>' +
+      '<button class="btn btn-outline" data-nav="reports">📊 Reports</button>' +
+    '</div>' +
+    '<div class="btnrow">' +
+      '<button class="btn btn-outline" data-nav="expenses">💵 Expense Diary</button>' +
+      '<button class="btn btn-wa-due" id="openRemindersBtn">📨 Send Reminders</button>' +
+    '</div>' +
+  '</div>';
+
+  var paidRows = [], pendingRows = [];
+  activeCustomers().forEach(function(c){
+    var txns = DATA.transactions[c.id] || [];
+    var s = computeStats(c, txns, DATA.settings);
+    var todaysTxns = txns.filter(function(t){ return t.date === todayISO(); });
+    var netAmountToday = round2(todaysTxns.reduce(function(sum,t){ return sum + t.amountPaid; }, 0));
+    if (netAmountToday > 0.004){
+      var todaysOriginals = todaysTxns.filter(function(t){ return !t.isCorrection; }).sort(function(a,b){ return b.timestamp - a.timestamp; });
+      var agg = {
+        amountPaid: netAmountToday,
+        penaltyPaid: round2(todaysTxns.reduce(function(sum,t){ return sum + (t.penaltyPaid||0); }, 0)),
+        timestamp: todaysTxns[todaysTxns.length-1].timestamp,
+        days: todaysOriginals.map(function(t){ return t.dayNumber; }).sort(function(x,y){ return x-y; }),
+        lastTxnId: todaysOriginals.length ? todaysOriginals[0].id : null
+      };
+      paidRows.push({c:c, s:s, agg:agg});
+    } else if (s.hasStarted && !s.isCompleted && s.todaysDue){
+      pendingRows.push({c:c, s:s});
+    }
+  });
+
+  pendingRows.sort(function(a,b){
+    if (b.s.lateDays !== a.s.lateDays) return b.s.lateDays - a.s.lateDays;
+    if (b.s.penaltyDue !== a.s.penaltyDue) return b.s.penaltyDue - a.s.penaltyDue;
+    if (a.s.currentDayNumber !== b.s.currentDayNumber) return a.s.currentDayNumber - b.s.currentDayNumber;
+    return a.c.name.localeCompare(b.c.name);
+  });
+  paidRows.sort(function(a,b){ return b.agg.timestamp - a.agg.timestamp; });
+
+  html += '<div class="section-title">🟢 Paid Today (' + paidRows.length + ')</div>';
+  if (!paidRows.length) html += '<div class="card empty">No payments recorded yet today.</div>';
+  paidRows.slice(0, 20).forEach(function(r){ html += paidCard(r.c, r.s, r.agg); });
+
+  html += '<div class="section-title">🔴 Pending Today (' + pendingRows.length + ')</div>';
+  if (!pendingRows.length) html += '<div class="card empty">Nothing pending — everyone is settled for today.</div>';
+  pendingRows.slice(0, 20).forEach(function(r){ html += pendingCard(r.c, r.s); });
+
+  html += '<div class="section-title">Share Summary</div>';
+  html += '<div class="card">';
+  html += '<label>Message Type</label>' +
+    '<div class="btnrow">' +
+      '<button class="btn ' + (COLLECTION_MSG_TYPE==="full" ? "btn-primary" : "btn-outline") + '" data-msgtype="full">📊 Full Summary</button>' +
+      '<button class="btn ' + (COLLECTION_MSG_TYPE==="simple" ? "btn-primary" : "btn-outline") + '" data-msgtype="simple">💰 Sirf Collection Amount</button>' +
+    '</div>';
+  if (defaultCollNum){
+    html += '<div class="btnrow"><button class="btn btn-wa-paid" id="quickSendCollectionBtn" style="width:100%;">⚡ Quick Send to Saved Number (' + escapeHtml(defaultCollNum) + ')</button></div>';
+  }
+  html += '<div class="helpline">Send today\'s collection summary to any number — doesn\'t need to be a saved customer. Manual number always works; the saved default above is just a shortcut.</div>' +
+    '<label>Mobile Number *</label><input type="tel" id="collWaNumber" placeholder="10-digit mobile number" maxlength="10" value="' + escapeHtml(defaultCollNum || "") + '">' +
+    '<label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="collSaveDefault" style="width:auto;margin:0;"> Save this number as default</label>' +
+    '<div class="btnrow"><button class="btn btn-wa-paid" id="sendCollectionWaBtn" style="width:100%;">📲 Send on WhatsApp</button></div>' +
+    '<div class="btnrow">' +
+      '<button class="btn btn-outline" id="copyCollectionBtn">📋 Copy Message</button>' +
+      '<button class="btn btn-outline" id="shareCollectionBtn">📤 Share (Other Apps)</button>' +
+    '</div>' +
+    '<div class="helpline" style="white-space:pre-line;margin-top:10px;padding:10px;background:var(--paper);border-radius:8px;border:1px solid var(--line);">' + escapeHtml(getSelectedCollectionMessage()) + '</div>' +
+  '</div>';
+
+  if (count === 0){
+    html += '<div class="card empty">No customers yet.<br>Tap "Add Customer" to start your first ledger.</div>';
+  }
+  return html;
+}
+function statCard(label, val){
+  return '<div class="card stat-card"><div class="lbl">' + escapeHtml(label) + '</div><div class="val">' + val + '</div></div>';
+}
+
+/* ---------- Expense Diary ---------- */
+function renderExpenses(){
+  var list = (DATA.expenses || []).slice().sort(function(a,b){ return b.timestamp - a.timestamp; });
+  var todayTotal = round2(list.filter(function(e){ return e.date === todayISO(); }).reduce(function(s,e){ return s + e.amount; }, 0));
+  var overallTotal = round2(list.reduce(function(s,e){ return s + e.amount; }, 0));
+  var trashList = DATA.expenseTrash || [];
+
+  var html = "";
+  html += '<div class="card" style="background:var(--brand);color:#fff;border:none;">' +
+    '<div style="font-size:11.5px;color:#BFE0D8;text-transform:uppercase;letter-spacing:.05em;">Today\'s Expenses</div>' +
+    '<div style="font-family:\'Fraunces\',serif;font-size:28px;font-weight:700;margin-top:3px;color:#fff;">' + inr(todayTotal) + '</div>' +
+    '<div style="font-size:12px;color:#BFE0D8;margin-top:8px;">Overall total: ' + inr(overallTotal) + ' across ' + list.length + ' entr' + (list.length===1?'y':'ies') + '</div>' +
+  '</div>';
+
+  html += '<div class="section-title">Add Expense</div>';
+  html += '<div class="card">' +
+    '<label>What was it for? *</label><input type="text" id="exp_name" placeholder="e.g. Petrol, Chai, Printout">' +
+    '<label>Amount (₹) *</label><input type="number" min="0.01" step="0.01" id="exp_amount" max="10000000" placeholder="e.g. 150">' +
+    '<div class="btnrow"><button class="btn btn-primary" id="addExpenseBtn">➕ Add to Diary</button></div>' +
+  '</div>';
+
+  // group entries day-wise
+  var groupOrder = [];
+  var groups = {};
+  list.forEach(function(e){
+    if (!groups[e.date]){
+      groups[e.date] = {total: 0, entries: []};
+      groupOrder.push(e.date);
+    }
+    groups[e.date].total = round2(groups[e.date].total + e.amount);
+    groups[e.date].entries.push(e);
+  });
+  groupOrder.sort(function(a,b){ return b.localeCompare(a); });
+
+  html += '<div class="section-title">Day-wise Entries (' + list.length + ')</div>';
+  if (!list.length){
+    html += '<div class="card empty">No expenses noted yet.<br>Add one above — the total updates automatically.</div>';
+  }
+  groupOrder.forEach(function(d){
+    var g = groups[d];
+    html += '<div class="card">' +
+      '<div class="crow" style="padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px;">' +
+        '<div class="name">' + fmtDate(d) + (d === todayISO() ? ' (Today)' : '') + '</div>' +
+        '<div class="amt">' + inr(g.total) + '</div>' +
+      '</div>';
+    g.entries.forEach(function(e){
+      html += (
+        '<div class="crow" style="padding:6px 0;">' +
+          '<div><div style="font-size:13.5px;">' + escapeHtml(e.name) + '</div>' +
+          '<div class="sub">' + fmtTime(e.timestamp) + '</div></div>' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<div style="font-weight:600;font-size:13.5px;">' + inr(e.amount) + '</div>' +
+            '<button class="btn btn-danger btn-small" style="flex:none;padding:4px 8px;" data-delete-expense="' + e.id + '">✕</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+    html += '</div>';
+  });
+
+  html += '<div class="section-title">🗑️ Deleted Expenses (' + trashList.length + ')</div>';
+  if (!trashList.length){
+    html += '<div class="card empty">Nothing deleted — recovery bin is empty.</div>';
+  }
+  trashList.forEach(function(item, index){
+    var e = item.expense || {};
+    html += (
+      '<div class="card">' +
+        '<div class="crow">' +
+          '<div><div class="name">' + escapeHtml(e.name || "") + '</div>' +
+          '<div class="sub">' + inr(e.amount || 0) + ' · Deleted: ' + fmtDateTime(item.deletedAt) + '</div></div>' +
+        '</div>' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-primary" data-restore-expense="' + index + '">Restore</button>' +
+          '<button class="btn btn-danger" data-delete-expense-forever="' + index + '">Delete Forever</button>' +
+        '</div>' +
+      '</div>'
+    );
+  });
+
+  html += '<div class="section-title">Share via WhatsApp</div>';
+  html += '<div class="card">' +
+    '<div class="helpline">Sends today\'s expense entries and totals to any number — doesn\'t need to be a saved customer.</div>' +
+    '<label>Mobile Number *</label><input type="tel" id="expWaNumber" placeholder="10-digit mobile number" maxlength="10">' +
+    '<div class="btnrow"><button class="btn btn-wa-paid" id="sendExpenseWaBtn" style="width:100%;">📲 Send Expense Summary on WhatsApp</button></div>' +
+  '</div>';
+
+  return html;
+}
+
+/* ---------- History ---------- */
+function renderHistory(){
+  var all = [];
+  DATA.customers.forEach(function(c){
+    (DATA.transactions[c.id] || []).forEach(function(t){ all.push({c:c, t:t}); });
+  });
+  all.sort(function(a,b){ return b.t.timestamp - a.t.timestamp; });
+
+  var q = HISTORY_Q.trim().toLowerCase();
+  if (q){
+    all = all.filter(function(r){
+      var hay = (r.c.name + " " + r.c.mobile + " " + r.c.id).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+  }
+
+  var html = "";
+  html += '<div class="searchbar"><input type="text" id="historySearchInput" placeholder="Search history by name, mobile or ID" value="' + escapeHtml(HISTORY_Q) + '"></div>';
+  html += '<div class="section-title">Permanent Transaction History (' + all.length + ')</div>';
+  if (!all.length){
+    html += '<div class="card empty">No transactions recorded yet.</div>';
+  }
+  all.slice(0, 100).forEach(function(r){
+    var isCorr = r.t.isCorrection;
+    html += (
+      '<div class="card" data-open-customer="' + r.c.id + '" style="' + (isCorr ? 'border-left:4px solid var(--penalty);' : '') + '">' +
+        '<div class="crow">' +
+          '<div><div class="name">' + escapeHtml(r.c.name) + ' ' + (isCorr ? '<span class="badge penalty">CORRECTION</span>' : '') + '</div>' +
+          '<div class="sub">Day ' + r.t.dayNumber + '/' + r.c.period + ' · ' + fmtDateTime(r.t.timestamp) + (r.t.note ? ' · ' + escapeHtml(r.t.note) : '') + '</div></div>' +
+          '<div style="text-align:right;"><div class="amt" style="color:' + (isCorr ? 'var(--penalty)' : 'inherit') + ';">' + inr(r.t.amountPaid) + '</div>' +
+          (r.t.penaltyPaid ? '<div class="sub">+' + inr(r.t.penaltyPaid) + ' penalty</div>' : '') + '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  });
+  return html;
+}
+
+/* ---------- Trash ---------- */
+function renderTrash(){
+  var trashList = DATA.trash || [];
+  var html = "";
+  html += '<div class="section-title">🗑️ Trash Bin (' + trashList.length + ')</div>';
+  if (!trashList.length){
+    html += '<div class="card empty">Trash bin is empty.</div>';
+    return html;
+  }
+  trashList.forEach(function(item, index){
+    var c = item.customer;
+    html += (
+      '<div class="card">' +
+        '<div class="crow">' +
+          '<div><div class="name">' + escapeHtml(c.name) + '</div>' +
+          '<div class="sub">' + escapeHtml(c.mobile) + ' · Deleted: ' + fmtDateTime(item.deletedAt) + '</div></div>' +
+          '<span class="badge penalty">DELETED</span>' +
+        '</div>' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-primary" data-restore-trash="' + index + '">Restore</button>' +
+          '<button class="btn btn-danger" data-delete-trash="' + index + '">Delete Forever</button>' +
+        '</div>' +
+      '</div>'
+    );
+  });
+  return html;
+}
+
+function paidCard(c, s, agg){
+  return (
+    '<div class="card">' +
+      '<div class="crow">' +
+        '<div><div class="name">' + escapeHtml(c.name) + '</div>' +
+        '<div class="sub">' + escapeHtml(c.mobile) + ' · Day(s) ' + agg.days.join(", ") + ' of ' + c.period + '</div></div>' +
+        '<span class="badge paid">PAID</span>' +
+      '</div>' +
+      '<div class="grid2" style="margin-top:10px;">' +
+        miniStat("Amount Paid", inr(agg.amountPaid)) +
+        miniStat("Time", fmtDateTime(agg.timestamp)) +
+        (agg.penaltyPaid ? miniStat("Penalty Paid", inr(agg.penaltyPaid)) : "") +
+        miniStat("Remaining", inr(s.totalOutstanding)) +
+      '</div>' +
+      '<div class="sub" style="margin-top:6px;">Remaining days: ' + s.remainingDays + '</div>' +
+      '<div class="btnrow">' +
+        '<a class="wa-link" style="flex:1" href="' + waLink(c.mobile, waPaidMessage(c, s, agg)) + '" target="_self" rel="noopener">' +
+          '<button class="btn btn-wa-paid" style="width:100%;">WhatsApp Paid</button></a>' +
+        '<button class="btn btn-outline" data-open-customer="' + c.id + '">View Ledger</button>' +
+      '</div>' +
+      (agg.lastTxnId ? '<div class="btnrow"><button class="btn btn-danger" style="width:100%;" data-mark-unpaid="' + agg.lastTxnId + '" data-cust-id="' + c.id + '">↩️ Galti se Paid ho gaya? Unpaid karo</button></div>' : '') +
+    '</div>'
+  );
+}
+function pendingCard(c, s){
+  var total = round2(s.todaysDueAmount + s.penaltyDue);
+  return (
+    '<div class="card">' +
+      '<div class="crow">' +
+        '<div><div class="name">' + escapeHtml(c.name) + '</div>' +
+        '<div class="sub">' + escapeHtml(c.mobile) + ' · Day ' + s.currentDayNumber + '/' + c.period + '</div></div>' +
+        '<span class="badge due">PENDING</span>' +
+      '</div>' +
+      '<div class="grid2" style="margin-top:10px;">' +
+        miniStat("Today's Due", inr(s.todaysDueAmount)) +
+        miniStat("Late Days", s.lateDays) +
+        (s.penaltyDue ? miniStat("Penalty", inr(s.penaltyDue)) : "") +
+        miniStat("Total Due", inr(total)) +
+      '</div>' +
+      '<div class="btnrow">' +
+        '<button class="btn btn-primary" data-mark-paid="' + c.id + '">Mark as Paid</button>' +
+      '</div>' +
+      '<div class="btnrow">' +
+        '<a class="wa-link" style="flex:1" href="' + waLink(c.mobile, waDueMessage(c, s)) + '" target="_self" rel="noopener">' +
+          '<button class="btn btn-wa-due" style="width:100%;">WhatsApp Due + Penalty</button></a>' +
+        '<button class="btn btn-outline" data-open-customer="' + c.id + '">Ledger</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+function miniStat(label, val){
+  return '<div><div class="lbl" style="font-size:11px;color:var(--ink-soft);">' + escapeHtml(label) + '</div><div style="font-weight:700;font-size:14px;">' + val + '</div></div>';
+}
+
+/* ============================= SEPARATE DUE PAYMENT FLOW ============================= */
+function waDuePaymentMessage(c, stats, amount, penalty){
+  var total = round2((amount || 0) + (penalty || 0));
+  var remaining = Math.max(0, round2(stats.totalOutstanding - total));
+  return [
+    'Payment received — thank you, ' + c.name + '!',
+    'Amount received: ' + inr(total),
+    'Date: ' + fmtDate(todayISO()),
+    'Remaining balance: ' + inr(remaining)
+  ].join('\n');
+}
+
+function openReceiveDueModal(customerId){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  if (!c){ showToast('Customer not found — it may have been moved or deleted.'); return; }
+  var txns = DATA.transactions[c.id] || [];
+  var s = computeStats(c, txns, DATA.settings);
+  var duePrincipal = round2(s.todaysDueAmount);
+  var duePenalty = round2(s.penaltyDue);
+  var totalDue = round2(duePrincipal + duePenalty);
+  if (totalDue <= 0.004){ showToast('No outstanding due for ' + c.name + '.'); return; }
+
+  var wrap = document.createElement('div');
+  wrap.className = 'overlay';
+  wrap.id = 'duePaymentOverlay';
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button class="closebtn" data-close-due-payment="1" style="font-size:14px;">←</button>' +
+          '<h2>Receive Due</h2>' +
+        '</div>' +
+        '<button class="closebtn" data-close-due-payment="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="crow"><div class="name">' + escapeHtml(c.name) + '</div><span class="badge due">DUE</span></div>' +
+        '<div class="grid2" style="margin-top:10px;">' +
+          miniStat('Pending Amount', inr(duePrincipal)) +
+          miniStat('Penalty Due', inr(duePenalty)) +
+        '</div>' +
+        '<div class="sub" style="margin-top:8px;">Total outstanding due: <b>' + inr(totalDue) + '</b></div>' +
+        '<label>Payment Type</label>' +
+        '<div class="feature-grid" style="margin-bottom:8px;">' +
+          '<button type="button" class="btn btn-outline" id="dueFullBtn">🟢 Full Payment</button>' +
+          '<button type="button" class="btn btn-outline" id="duePartialBtn">🟡 Partial Payment</button>' +
+          '<button type="button" class="btn btn-outline" id="dueCustomBtn">🔵 Custom Amount</button>' +
+        '</div>' +
+        '<label>Due Amount Received (₹) *</label>' +
+        '<input type="number" min="0" max="' + duePrincipal + '" step="0.01" id="duePayAmount" value="' + (duePrincipal > 0 ? duePrincipal : 0) + '">' +
+        '<div class="btnrow" style="gap:6px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-small btn-outline" data-due-quick="50">₹50</button>' +
+          '<button type="button" class="btn btn-small btn-outline" data-due-quick="100">₹100</button>' +
+          '<button type="button" class="btn btn-small btn-outline" data-due-quick="150">₹150</button>' +
+          '<button type="button" class="btn btn-small btn-outline" data-due-quick="full">Full ₹' + duePrincipal + '</button>' +
+        '</div>' +
+        '<div id="dueRemainingPreview" class="helpline" style="font-weight:700;">Remaining after this payment: ' + inr(Math.max(0, duePrincipal - (duePrincipal > 0 ? duePrincipal : 0))) + '</div>' +
+        '<div class="helpline">Partial payment is allowed. Example: ₹200 due → ₹150 received → ₹50 remaining. Later ₹50 can be received separately.</div>' +
+        '<label>Penalty Received (₹)</label>' +
+        '<input type="number" min="0" max="' + duePenalty + '" step="0.01" id="duePayPenalty" value="0">' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-outline" data-close-due-payment="1">Cancel</button>' +
+          '<button class="btn btn-primary" id="confirmDuePaymentBtn">Receive &amp; Save</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+  document.body.appendChild(wrap);
+  try { history.pushState({view: VIEW, param: VIEW_PARAM}, '', ''); } catch(e){}
+  var open = true;
+
+  function dismissModal(){
+    if (!wrap.isConnected) return;
+    wrap.remove();
+    if (open){ open = false; try { history.back(); } catch(e){} }
+  }
+  wrap.addEventListener('click', function(e){
+    if (e.target.id === 'duePaymentOverlay' || e.target.hasAttribute('data-close-due-payment')) dismissModal();
+  });
+
+  var amountInput = document.getElementById('duePayAmount');
+  var remainingPreview = document.getElementById('dueRemainingPreview');
+  function updateDuePreview(){
+    var entered = round2(parseFloat(amountInput.value) || 0);
+    var rem = Math.max(0, round2(duePrincipal - entered));
+    remainingPreview.textContent = 'Remaining after this payment: ' + inr(rem);
+  }
+  amountInput.addEventListener('input', updateDuePreview);
+  document.getElementById('dueFullBtn').addEventListener('click', function(){ amountInput.value = duePrincipal; updateDuePreview(); });
+  document.getElementById('duePartialBtn').addEventListener('click', function(){
+    amountInput.focus();
+    amountInput.select();
+    showToast('Partial amount enter karo, jaise ₹150.');
+  });
+  document.getElementById('dueCustomBtn').addEventListener('click', function(){
+    amountInput.value = '';
+    amountInput.focus();
+    updateDuePreview();
+  });
+  wrap.querySelectorAll('[data-due-quick]').forEach(function(qb){
+    qb.addEventListener('click', function(){
+      var v = qb.getAttribute('data-due-quick');
+      amountInput.value = v === 'full' ? duePrincipal : Math.min(duePrincipal, Number(v) || 0);
+      updateDuePreview();
+    });
+  });
+  updateDuePreview();
+
+  document.getElementById('confirmDuePaymentBtn').addEventListener('click', async function(){
+    var btn = this;
+    if (btn.disabled) return;
+    var amount = round2(parseFloat(document.getElementById('duePayAmount').value) || 0);
+    var penalty = round2(parseFloat(document.getElementById('duePayPenalty').value) || 0);
+    if (amount <= 0 && penalty <= 0){ showToast('Enter an amount greater than zero.'); return; }
+    if (amount > duePrincipal + 0.004){ showToast('Amount cannot be more than the current pending due.'); return; }
+    if (penalty > duePenalty + 0.004){ showToast('Penalty received cannot be more than the penalty due.'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    var result = await markPaid(c.id, amount, penalty);
+    if (!result.ok){
+      btn.disabled = false;
+      btn.textContent = 'Receive & Save';
+      showToast('Could not record payment — please try again.');
+      return;
+    }
+    dismissModal();
+    showToast('Due payment received: ' + inr(round2(amount + penalty)) + '.');
+    render();
+  });
+}
+
+/* ---------- Customers ---------- */
+function renderCustomers(){
+  var q = SEARCH_Q.trim().toLowerCase();
+  var list = DATA.customers.filter(function(c){
+    if (CUSTOMER_FILTER === "active"){
+      if (c.archived) return false;
+      // c.status is never updated away from "active" anywhere in the app —
+      // check the computed completion state instead, or fully-paid plans
+      // never leave the Active tab.
+      var txnsAct = DATA.transactions[c.id] || [];
+      if (computeStats(c, txnsAct, DATA.settings).isCompleted) return false;
+    }
+    if (CUSTOMER_FILTER === "completed"){
+      var txns = DATA.transactions[c.id] || [];
+      var s = computeStats(c, txns, DATA.settings);
+      if (!s.isCompleted) return false;
+    }
+    if (CUSTOMER_FILTER === "pending"){
+      var txns2 = DATA.transactions[c.id] || [];
+      var s2 = computeStats(c, txns2, DATA.settings);
+      if (!(s2.hasStarted && s2.todaysDue && !s2.isCompleted)) return false;
+      if (c.archived) return false;
+    }
+    if (CUSTOMER_FILTER === "archived" && !c.archived) return false;
+    if (CUSTOMER_FILTER === "all" && c.archived) return false;
+    if (q){
+      var hay = (c.name + " " + c.mobile + " " + c.id).toLowerCase();
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+  list.sort(function(a,b){ return b.createdAt - a.createdAt; });
+
+  var html = "";
+  html += '<div class="searchbar"><input type="text" id="searchInput" placeholder="Search by name, mobile or ID" value="' + escapeHtml(SEARCH_Q) + '"></div>';
+  html += '<div class="filterrow">';
+  [["all","All"],["active","Active"],["pending","Pending Today"],["completed","Completed"],["archived","Archived"]].forEach(function(f){
+    html += '<button class="chip' + (CUSTOMER_FILTER===f[0]?" active":"") + '" data-filter="' + f[0] + '">' + f[1] + '</button>';
+  });
+  html += '</div>';
+
+  if (!list.length){
+    html += '<div class="card empty">No customers match this view.</div>';
+  }
+
+  var paginatedList = list.slice(0, CUSTOMER_LIST_LIMIT);
+  paginatedList.forEach(function(c){
+    var txns = DATA.transactions[c.id] || [];
+    var s = computeStats(c, txns, DATA.settings);
+    var badge = c.archived ? '<span class="badge" style="background:#EEE;color:#888;">ARCHIVED</span>' :
+      s.isCompleted ? '<span class="badge paid">COMPLETED</span>' :
+      (s.hasStarted && s.todaysDue) ? '<span class="badge due">DUE</span>' : '<span class="badge paid">OK</span>';
+    html += (
+      '<div class="card" data-open-customer="' + c.id + '">' +
+        '<div class="crow">' +
+          '<div><div class="name">' + escapeHtml(c.name) + '</div>' +
+          '<div class="sub">' + escapeHtml(c.mobile) + ' · Principal ' + inr(c.principal) + (isFivePlan(c) ? ' · ₹5,000 plan' : '') + '</div></div>' +
+          badge +
+        '</div>' +
+        '<div class="sub" style="margin-top:6px;">Outstanding: ' + inr(s.totalOutstanding) + ' · Day ' + s.currentDayNumber + '/' + c.period +
+        '</div>' +
+        '<div class="btnrow" style="margin-top:10px;">' +
+          '<button class="btn btn-outline btn-small" data-edit-customer="' + c.id + '">✏️ Edit</button>' +
+          '<button class="btn btn-danger btn-small" data-move-trash="' + c.id + '">🗑️ Trash</button>' +
+        '</div>' +
+      '</div>'
+    );
+  });
+
+  if (list.length > CUSTOMER_LIST_LIMIT){
+    html += '<div class="btnrow"><button class="btn btn-outline" id="loadMoreBtn">Load More Customers (' + (list.length - CUSTOMER_LIST_LIMIT) + ' remaining)</button></div>';
+  }
+
+  return html;
+}
+
+/* ---------- Reports ---------- */
+function renderReports(){
+  var t = todayTotals();
+  var html = "";
+  
+  html += '<div class="section-title">Select Month for Report</div>';
+  html += '<div class="card">' +
+    '<label>Report Month</label>' +
+    '<input type="month" id="reportMonthInput" value="' + escapeHtml(REPORTS_MONTH) + '">' +
+  '</div>';
+
+  var ym = REPORTS_MONTH;
+  var monthCollected = 0, monthPenalty = 0, monthCount = 0;
+  DATA.customers.forEach(function(c){
+    (DATA.transactions[c.id]||[]).forEach(function(tx){
+      if (tx.date && tx.date.indexOf(ym) === 0){
+        monthCollected += tx.amountPaid;
+        monthPenalty += (tx.penaltyPaid||0);
+        if (!tx.isCorrection) monthCount++;
+      }
+    });
+  });
+
+  html += '<div class="section-title">Monthly Summary (' + ym + ')</div>';
+  html += '<div class="card">' +
+    reportRow("Payments Recorded", monthCount) +
+    reportRow("Total Collection", inr(monthCollected)) +
+    reportRow("Total Penalty Collected", inr(monthPenalty)) +
+  '</div>';
+
+  html += '<div class="section-title">Overall Ledger State</div>';
+  html += '<div class="card">' +
+    reportRow("Total Customers", activeCustomers().length) +
+    reportRow("Total Principal", inr(t.totalPrincipal)) +
+    reportRow("Total Collected (All-time)", inr(t.totalCollectedAll)) +
+    reportRow("Total Pending", inr(t.totalPendingAll)) +
+    reportRow("Total Penalty (live)", inr(t.totalPenaltyAll)) +
+    reportRow("Total Outstanding", inr(t.totalOutstandingAll)) +
+  '</div>';
+
+  html += '<div class="section-title">Customer-wise Collection</div>';
+  if (!DATA.customers.length) html += '<div class="card empty">No customers yet.</div>';
+  DATA.customers.forEach(function(c){
+    var txns = DATA.transactions[c.id] || [];
+    var s = computeStats(c, txns, DATA.settings);
+    html += '<div class="card" data-open-customer="' + c.id + '">' +
+      '<div class="crow"><div class="name">' + escapeHtml(c.name) + '</div><div class="amt">' + inr(s.totalCollected) + '</div></div>' +
+      '<div class="sub">Collected of ' + inr(c.principal) + ' · Outstanding ' + inr(s.totalOutstanding) + '</div>' +
+    '</div>';
+  });
+  return html;
+}
+function reportRow(label, val){
+  return '<div class="crow" style="padding:6px 0;"><div class="sub" style="font-size:13px;">' + escapeHtml(label) + '</div><div style="font-weight:700;">' + val + '</div></div>';
+}
+
+/* ---------- Settings ---------- */
+function renderSettings(){
+  var s = DATA.settings;
+  var html = "";
+  if (usingFallback){
+    html += '<div class="banner">IndexedDB was unavailable, using session storage.</div>';
+  }
+  html += '<div class="section-title">Penalty & Country Rule</div>';
+  html += '<div class="card">' +
+    '<label>Penalty amount per late day (₹)</label>' +
+    '<input type="number" min="0" step="0.01" id="setPenalty" value="' + s.penaltyPerDay + '">' +
+    '<label>WhatsApp country code</label>' +
+    '<input type="text" id="setCountryCode" value="' + escapeHtml(s.countryCode) + '">' +
+  '</div>';
+
+  html += '<div class="section-title">Quick Share — Default Number</div>';
+  html += '<div class="card">' +
+    '<div class="helpline">Save a number here (your own, family, or accountant) to send today\'s collection summary in one tap from Home — without typing it every time. Leave blank to always enter manually.</div>' +
+    '<label>Default Collection WhatsApp Number</label>' +
+    '<input type="tel" id="setDefaultCollNumber" placeholder="10-digit mobile number" maxlength="10" value="' + escapeHtml(s.defaultCollectionNumber || "") + '">' +
+  '</div>';
+
+  html += '<div class="section-title">Customizable WhatsApp Templates</div>';
+  html += '<div class="card">' +
+    '<label>Payment Received Template</label>' +
+    '<textarea id="setWaPaid" rows="3">' + escapeHtml(s.waPaidTemplate || defaultData().settings.waPaidTemplate) + '</textarea>' +
+    '<label>Due Reminder Template</label>' +
+    '<textarea id="setWaDue" rows="3">' + escapeHtml(s.waDueTemplate || defaultData().settings.waDueTemplate) + '</textarea>' +
+    '<div class="btnrow"><button class="btn btn-primary" id="saveSettingsBtn">Save All Settings</button></div>' +
+  '</div>';
+
+  html += '<div class="section-title">Backup &amp; Restore</div>';
+  html += '<div class="card">' +
+    '<div class="helpline">Your data auto-saves permanently on this device (IndexedDB). Export a backup regularly as extra safety — nothing is ever deleted automatically.</div>' +
+    '<div class="btnrow"><button class="btn btn-primary" id="exportBtn">Export Backup (JSON)</button></div>' +
+  '</div>';
+  html += '<div class="card">' +
+    '<input type="file" id="importFile" accept=".json,application/json">' +
+    '<div class="btnrow"><button class="btn btn-outline" id="importBtn">Restore from Backup (JSON)</button></div>' +
+  '</div>';
+  html += '<div class="section-title">Excel (.xlsx) — like a spreadsheet</div>';
+  html += '<div class="card">' +
+    '<div class="helpline">Download all customers &amp; transactions as a real Excel file — view or hand it off outside the software anytime.</div>' +
+    '<div class="btnrow"><button class="btn btn-primary" id="exportExcelBtn">Export to Excel (.xlsx)</button></div>' +
+  '</div>';
+  html += '<div class="card">' +
+    '<div class="helpline">Restore data from a previously exported Excel file. This replaces current data — you\'ll be asked to confirm first.</div>' +
+    '<input type="file" id="importExcelFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">' +
+    '<div class="btnrow"><button class="btn btn-outline" id="importExcelBtn">Restore from Excel (.xlsx)</button></div>' +
+  '</div>';
+  return html;
+}
+
+/* ---------- Add Customer Overlay with Dual Exit (X & Back) ---------- */
+function renderAddCustomerOverlay(){
+  var root = document.getElementById("root");
+  var wrap = document.createElement("div");
+  wrap.className = "overlay";
+  wrap.id = "addOverlay";
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button class="closebtn" data-close-overlay="1" style="font-size:14px;">←</button>' +
+          '<h2>Add Customer</h2>' +
+        '</div>' +
+        '<button class="closebtn" data-close-overlay="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' +
+        '<label>Customer Name *</label><input type="text" id="f_name" placeholder="Full name">' +
+        '<label>Mobile Number (10 digits) *</label><input type="tel" id="f_mobile" placeholder="10-digit mobile number" maxlength="10">' +
+        '<label>Principal Amount (₹) *</label><input type="number" min="1" step="0.01" id="f_principal" max="10000000" placeholder="e.g. 5000" oninput="window.__cdmAutofillPlan()">' +
+        '<label>Collection Period (days) *</label><input type="number" min="1" step="1" id="f_period" placeholder="e.g. 30" oninput="window.__cdmAutofillDaily()">' +
+        '<label>Daily Collection Amount (₹) *</label><input type="number" min="0.01" step="0.01" id="f_daily" max="10000000" placeholder="auto-calculated, editable">' +
+        '<div class="helpline">20% cut reference: <b id="f_cutPreview">₹0</b></div>' +
+        '<label>Custom Penalty per Late Day (₹)</label><input type="number" min="0" step="0.01" id="f_penalty" max="10000000" placeholder="Leave blank to use default (' + (DATA.settings.penaltyPerDay||0) + ')">' +
+        '<div class="helpline">Optional — set a different late-fee rate just for this customer. Leave blank to use the default rate from Settings.</div>' +
+        '<label>Start Date *</label><input type="date" id="f_startDate" value="' + todayISO() + '">' +
+        '<label>Notes</label><textarea id="f_notes" rows="2" placeholder="Optional"></textarea>' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-outline" data-close-overlay="1">Cancel</button>' +
+          '<button class="btn btn-primary" id="saveCustomerBtn">Save Customer</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+  root.appendChild(wrap);
+
+  window.__cdmAutofillPlan = function(){
+    var p = parseFloat(document.getElementById("f_principal").value) || 0;
+    document.getElementById("f_cutPreview").textContent = inr(twentyPercentCut(p));
+    if (p === 5000 && !document.getElementById("f_period").value){
+      document.getElementById("f_period").value = 30;
+      window.__cdmAutofillDaily();
+    }
+  };
+  window.__cdmAutofillDaily = function(){
+    var p = parseFloat(document.getElementById("f_principal").value) || 0;
+    var per = parseFloat(document.getElementById("f_period").value, 10) || 0;
+    if (p > 0 && per > 0){
+      var exactDaily = p / per;
+      document.getElementById("f_daily").value = exactDaily.toFixed(2);
+    }
+  };
+
+  document.getElementById("saveCustomerBtn").addEventListener("click", async function(){
+    var name = document.getElementById("f_name").value.trim();
+    var mobile = document.getElementById("f_mobile").value.trim();
+    var principal = parseFloat(document.getElementById("f_principal").value);
+    var period = parseInt(document.getElementById("f_period").value, 10);
+    var daily = parseFloat(document.getElementById("f_daily").value);
+    var penaltyOverride = document.getElementById("f_penalty").value.trim();
+    var startDate = document.getElementById("f_startDate").value;
+    var notes = document.getElementById("f_notes").value;
+
+    if (!name || !mobile || !principal || principal<=0 || !period || period<=0 || !daily || daily<=0 || !startDate){
+      showToast("Please fill all required fields correctly.");
+      return;
+    }
+    if (!validateMobile(mobile)){
+      showToast("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    this.disabled = true;
+    await addCustomer({name:name, mobile:mobile, principal:principal, startDate:startDate, period:period, dailyAmount:daily, penaltyPerDay:penaltyOverride, notes:notes});
+    showToast("Customer added successfully.");
+    history.back();
+  });
+
+  wrap.addEventListener("click", function(e){
+    if (e.target.id === "addOverlay" || e.target.hasAttribute("data-close-overlay")){
+      history.back();
+    }
+  });
+}
+
+/* ---------- Edit Customer Overlay with Dual Exit ---------- */
+function renderEditCustomerOverlay(customerId){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  var root = document.getElementById("root");
+  if (!c){ setView("customers", null, false); return; }
+
+  var wrap = document.createElement("div");
+  wrap.className = "overlay";
+  wrap.id = "editOverlay";
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button class="closebtn" data-close-edit="1" style="font-size:14px;">←</button>' +
+          '<h2>Edit Customer</h2>' +
+        '</div>' +
+        '<button class="closebtn" data-close-edit="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' +
+        '<label>Customer Name *</label><input type="text" id="e_name" value="' + escapeHtml(c.name) + '">' +
+        '<label>Mobile Number *</label><input type="tel" id="e_mobile" value="' + escapeHtml(c.mobile) + '" maxlength="10">' +
+        '<label>Daily Collection Amount (₹) *</label><input type="number" min="0.01" step="0.01" id="e_daily" max="10000000" value="' + c.dailyAmount + '">' +
+        '<label>Custom Penalty per Late Day (₹)</label><input type="number" min="0" step="0.01" id="e_penalty" max="10000000" placeholder="Leave blank to use default (' + (DATA.settings.penaltyPerDay||0) + ')" value="' + (c.penaltyPerDay!=null ? c.penaltyPerDay : '') + '">' +
+        '<div class="helpline">Optional — set a different late-fee rate just for this customer. Leave blank to use the default rate from Settings.</div>' +
+        '<label>Notes</label><textarea id="e_notes" rows="2">' + escapeHtml(c.notes||"") + '</textarea>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="helpline" style="color:var(--penalty);">⚠️ These fields affect existing calculations — change only to correct a mistake made while adding this customer, not for a fresh plan (create a new customer for that instead).</div>' +
+        '<label>Principal Amount (₹) *</label><input type="number" min="1" step="0.01" id="e_principal" max="10000000" value="' + c.principal + '">' +
+        '<label>Collection Period (days) *</label><input type="number" min="1" step="1" id="e_period" value="' + c.period + '">' +
+        '<label>Start Date *</label><input type="date" id="e_startDate" value="' + escapeHtml(c.startDate) + '">' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-outline" data-close-edit="1">Cancel</button>' +
+          '<button class="btn btn-primary" id="updateCustomerBtn">Update Customer</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+  root.appendChild(wrap);
+
+  document.getElementById("updateCustomerBtn").addEventListener("click", async function(){
+    var name = document.getElementById("e_name").value.trim();
+    var mobile = document.getElementById("e_mobile").value.trim();
+    var daily = parseFloat(document.getElementById("e_daily").value);
+    var penaltyOverride = document.getElementById("e_penalty").value.trim();
+    var notes = document.getElementById("e_notes").value;
+    var principal = parseFloat(document.getElementById("e_principal").value);
+    var period = parseInt(document.getElementById("e_period").value, 10);
+    var startDate = document.getElementById("e_startDate").value;
+
+    if (!name || !mobile || !daily || daily <= 0 || !principal || principal <= 0 || !period || period <= 0 || !startDate){
+      showToast("Please provide valid details.");
+      return;
+    }
+    if (!validateMobile(mobile)){
+      showToast("Please enter a valid mobile number.");
+      return;
+    }
+
+    var updated = await updateCustomer(c.id, {name: name, mobile: mobile, dailyAmount: daily, notes: notes, principal: principal, period: period, startDate: startDate, penaltyPerDay: penaltyOverride});
+    if (!updated) return;
+    showToast("Customer updated successfully.");
+    history.back();
+  });
+
+  wrap.addEventListener("click", function(e){
+    if (e.target.id === "editOverlay" || e.target.hasAttribute("data-close-edit")){
+      history.back();
+    }
+  });
+}
+
+/* ---------- Customer Detail Fullview with Dual Exit ---------- */
+function renderCustomerDetailOverlay(customerId){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  var root = document.getElementById("root");
+  if (!c){ setView("customers", null, false); return; }
+  var txns = (DATA.transactions[c.id] || []).slice().sort(function(a,b){ return a.dayNumber - b.dayNumber; });
+  var s = computeStats(c, txns, DATA.settings);
+
+  var wrap = document.createElement("div");
+  wrap.className = "fullview";
+  wrap.id = "detailView";
+
+  var historyHtml = txns.length ? txns.map(function(t){
+    var isCorr = t.isCorrection;
+    return '<div class="txn" style="' + (isCorr ? 'background:var(--penalty-bg);padding:6px;border-radius:6px;margin-bottom:4px;' : '') + '">' +
+      '<div><b>Day ' + t.dayNumber + '</b> ' + (isCorr ? '<span class="badge penalty">CORRECTION</span>' : (isReversedTxn(txns, t) ? '<span class="badge penalty">REVERSED</span>' : '')) + '<div class="tl">' + fmtDate(t.date) + ' · ' + fmtDateTime(t.timestamp) + (t.note ? ' · ' + escapeHtml(t.note) : '') + '</div></div>' +
+      '<div style="text-align:right;"><div>' + inr(t.amountPaid) + '</div>' + 
+      (t.penaltyPaid ? '<div class="tl">+' + inr(t.penaltyPaid) + ' penalty</div>' : '') +
+      (!isCorr && !isReversedTxn(txns, t) ? '<button class="btn btn-danger btn-small" style="margin-top:4px;padding:2px 6px;font-size:10px;" data-mark-unpaid="' + t.id + '" data-cust-id="' + c.id + '">Mark Unpaid</button>' : '') +
+      '</div></div>';
+  }).reverse().join("") : '<div class="empty">No transactions recorded yet.</div>';
+
+  wrap.innerHTML = (
+    '<div class="fv-header">' +
+      '<button class="backbtn" id="detailBackBtn">←</button>' +
+      '<div style="flex:1;"><h2 style="color:#fff;font-size:18px;">' + escapeHtml(c.name) + '</h2>' +
+      '<div style="font-size:12px;color:#B9D6CE;">' + escapeHtml(c.mobile) + '</div></div>' +
+      '<button class="btn btn-small" style="background:rgba(255,255,255,0.2);color:#fff;" data-edit-customer="' + c.id + '">Edit</button>' +
+    '</div>' +
+    '<div class="fv-body">' +
+      '<div class="section-title">Customer Details</div>' +
+      '<div class="card">' +
+        detailRow("Principal", inr(c.principal)) +
+        detailRow("Start Date", fmtDate(c.startDate)) +
+        detailRow("Collection Period", c.period + " days" + (isFivePlan(c) ? " (₹5,000 special plan)" : "")) +
+        detailRow("Daily Collection", inr(c.dailyAmount)) +
+        (c.notes ? detailRow("Notes", escapeHtml(c.notes)) : "") +
+      '</div>' +
+
+      '<div class="section-title">Financial Summary</div>' +
+      '<div class="card">' +
+        detailRow("Principal Amount", inr(c.principal)) +
+        detailRow("20% Cut (reference)", inr(twentyPercentCut(c.principal))) +
+        detailRow("Penalty Rate", inr(s.effectivePenaltyRate) + "/day" + (c.penaltyPerDay!=null ? " (custom)" : " (default)")) +
+        detailRow("Total Collected", inr(s.totalCollected)) +
+        detailRow("Total Pending", inr(s.totalPending)) +
+        detailRow("Total Penalty Due", inr(s.penaltyDue)) +
+        detailRow("Total Outstanding", inr(s.totalOutstanding)) +
+        detailRow("Today's Due", inr(s.todaysDue ? s.todaysDueAmount : 0)) +
+        detailRow("Future Scheduled", inr(s.futureScheduled)) +
+        detailRow("Remaining Days", s.remainingDays) +
+      '</div>' +
+
+      (s.pendingDayNumbers.length ? (
+        '<div class="section-title">💰 Remaining Due Tracker</div>' +
+        '<div class="card">' +
+          '<div class="helpline" style="margin-bottom:8px">Har pending day ka alag hisaab. Partial payment dene par usi day ka remaining yahan dikhega.</div>' +
+          s.pendingDayNumbers.map(function(d){
+            var owed = round2(s.pendingDayShortfall[d] || 0);
+            var paid = round2(Math.max(0, c.dailyAmount - owed));
+            var status = d < s.currentDayNumber ? '🔴 Late Due' : (owed < c.dailyAmount - 0.004 ? '🟡 Partially Paid' : '🔴 Today Due');
+            return '<div class="day-row" style="padding:9px 0;border-bottom:1px solid var(--border)">' +
+              '<div style="flex:1"><b>Day ' + d + '</b><div class="sub">Due Date: ' + dueDateForDay(c,d) + ' · ' + status + '</div><div class="sub">Due ' + inr(c.dailyAmount) + ' · Paid ' + inr(paid) + '</div></div>' +
+              '<div style="text-align:right"><b style="font-size:16px">' + inr(owed) + '</b><div class="sub">Remaining</div></div>' +
+            '</div>';
+          }).join('') +
+        '</div>'
+      ) : '') +
+
+      (s.pendingDayNumbers.length ? (
+        '<div class="section-title">Pending Day-wise Breakdown</div>' +
+        '<div class="card">' +
+          s.pendingDayNumbers.map(function(d){
+            var owed = s.pendingDayShortfall[d];
+            var isPartial = owed < c.dailyAmount - 0.004;
+            return detailRow(
+              "Day " + d + (d < s.currentDayNumber ? " (late)" : "") + (isPartial ? " — partially paid" : ""),
+              inr(owed) + " due"
+            );
+          }).join("") +
+        '</div>'
+      ) : "") +
+
+      (s.hasStarted && !s.isCompleted && s.pendingDayNumbers.length ? (
+        '<div class="card">' +
+          '<div class="btnrow"><button class="btn btn-primary" data-mark-paid="' + c.id + '">Mark as Paid</button>' +
+          '<button class="btn btn-outline" data-receive-due="' + c.id + '">💰 Receive Due</button></div>' +
+          '<div class="btnrow">' +
+            '<a class="wa-link" style="flex:1" href="' + waLink(c.mobile, waDueMessage(c, s)) + '" target="_self" rel="noopener"><button class="btn btn-wa-due" style="width:100%;">WhatsApp Due</button></a>' +
+          '</div>' +
+        '</div>'
+      ) : '<div class="card"><div class="badge paid">' + (s.isCompleted ? "PLAN COMPLETED" : "UP TO DATE") + '</div></div>') +
+
+      '<div class="section-title">Complete History & Corrections</div>' +
+      '<div class="card">' + historyHtml + '</div>' +
+
+      '<div class="section-title">Manage</div>' +
+      '<div class="card"><div class="btnrow">' +
+        (c.archived ?
+          '<button class="btn btn-outline" data-unarchive="' + c.id + '">Unarchive Customer</button>' :
+          '<button class="btn btn-outline" data-archive="' + c.id + '">Archive Customer</button>') +
+      '</div>' +
+      '<div class="btnrow" style="margin-top:8px;">' +
+        '<button class="btn btn-danger" data-move-trash="' + c.id + '">Move to Trash</button>' +
+      '</div></div>' +
+    '</div>'
+  );
+  root.appendChild(wrap);
+
+  document.getElementById("detailBackBtn").addEventListener("click", function(){
+    history.back();
+  });
+}
+function detailRow(label, val){
+  return '<div class="crow" style="padding:5px 0;"><div class="sub" style="font-size:13px;">' + escapeHtml(label) + '</div><div style="font-weight:700;font-size:13.5px;text-align:right;max-width:60%;">' + val + '</div></div>';
+}
+
+/* ============================= MARK PAID FLOW ============================= */
+function openMarkPaidModal(customerId){
+  var c = DATA.customers.find(function(x){ return x.id === customerId; });
+  if (!c){ showToast("Customer not found — it may have been moved or deleted."); return; }
+  var txns = DATA.transactions[c.id] || [];
+  var s = computeStats(c, txns, DATA.settings);
+  var expected = round2(s.todaysDueAmount);
+  var expectedPenalty = s.penaltyDue;
+
+  var wrap = document.createElement("div");
+  wrap.className = "overlay";
+  wrap.id = "payOverlay";
+  wrap.innerHTML = (
+    '<div class="sheet">' +
+      '<div class="sheet-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<button class="closebtn" data-close-pay="1" style="font-size:14px;">←</button>' +
+          '<h2>Mark as Paid</h2>' +
+        '</div>' +
+        '<button class="closebtn" data-close-pay="1">✕</button>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="crow"><div class="name">' + escapeHtml(c.name) + '</div><span class="badge due">Day ' + s.currentDayNumber + '</span></div>' +
+        '<div class="sub" style="margin-top:4px;">Expected due amount: ' + inr(expected) + '</div>' +
+        '<label>Amount Received (₹) *</label><input type="number" min="0" step="0.01" id="payAmount" max="10000000" value="' + expected + '">' +
+        '<div class="helpline">Entering more than the due amount will automatically apply the extra to upcoming day(s) as an advance.</div>' +
+        '<label>Penalty Received (₹)</label><input type="number" min="0" step="0.01" id="payPenalty" max="10000000" value="' + expectedPenalty + '">' +
+        '<div class="btnrow">' +
+          '<button class="btn btn-outline" data-close-pay="1">Cancel</button>' +
+          '<button class="btn btn-primary" id="confirmPayBtn">Confirm &amp; Save</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+  document.body.appendChild(wrap);
+
+  // Push a history entry so the hardware/browser back button closes this
+  // modal instead of skipping past the screen underneath it. See
+  // closeAnyStrayModal() / the popstate handler for the other half of this.
+  try { history.pushState({view: VIEW, param: VIEW_PARAM}, "", ""); } catch(e){}
+  PAY_MODAL_OPEN = true;
+
+  function dismissModal(){
+    if (!wrap.isConnected) return; // already removed (e.g. by popstate)
+    wrap.remove();
+    if (PAY_MODAL_OPEN){
+      PAY_MODAL_OPEN = false;
+      try { history.back(); } catch(e){}
+    }
+  }
+
+  wrap.addEventListener("click", function(e){
+    if (e.target.id === "payOverlay" || e.target.hasAttribute("data-close-pay")) dismissModal();
+  });
+
+  document.getElementById("confirmPayBtn").addEventListener("click", async function(){
+    var btn = this;
+    if (btn.disabled) return;
+    var amt = parseFloat(document.getElementById("payAmount").value);
+    var pen = parseFloat(document.getElementById("payPenalty").value) || 0;
+    if (!validMoneyAmount(amt,false) || !validMoneyAmount(pen,true)){ showToast("Enter valid amounts (maximum ₹1 crore)."); return; }
+    var expectedNow = round2(expected);
+    if (amt > expectedNow && (amt - expectedNow) >= Math.max(100, expectedNow * 2)){
+      var extra = round2(amt - expectedNow);
+      if (!confirm("You entered " + inr(amt) + ". Today's expected amount is " + inr(expectedNow) + ". Extra " + inr(extra) + " will be applied automatically to future days as advance. Continue?")){ return; }
+    }
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    var result = await markPaid(c.id, amt, pen);
+    dismissModal();
+    if (result.ok){
+      if (result.advanceDays && result.advanceDays.length){
+        showToast("Payment recorded — extra applied in advance to day(s) " + result.advanceDays.join(", ") + ".");
+      } else if (result.leftoverAdvance > 0.004){
+        showToast("Payment recorded. ₹" + result.leftoverAdvance + " extra couldn't be applied — plan is fully paid up.");
+      } else {
+        showToast("Payment recorded successfully.");
+      }
+    } else if (result && result.ok === false) {
+      showToast("Could not record payment — please try again.");
+    }
+    render();
+  });
+}
+
+/* ============================= BACKUP / RESTORE ============================= */
+function exportBackup(){
+  var payload = {
+    exportedAt: new Date().toISOString(),
+    app: "daily-collection-manager",
+    data: DATA
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  saveFileCompat("collection-backup-" + todayISO() + ".json", blob, "Backup exported.");
+}
+
+function importBackup(file){
+  if (!file){ showToast("Choose a backup file first."); return; }
+  var reader = new FileReader();
+  reader.onload = async function(e){
+    try{
+      var parsed = JSON.parse(e.target.result);
+      var incoming = parsed.data || parsed;
+      if (!incoming || !Array.isArray(incoming.customers)){
+        showToast("Invalid backup file.");
+        return;
+      }
+      var proceed = confirm("Restoring will replace all current data. Continue?");
+      if (!proceed) return;
+      DATA = {
+        customers: incoming.customers || [],
+        transactions: incoming.transactions || {},
+        trash: incoming.trash || [],
+        expenses: incoming.expenses || [],
+        expenseTrash: incoming.expenseTrash || [],
+        settings: Object.assign(defaultData().settings, incoming.settings || {}),
+        nextBookNo: incoming.nextBookNo || 0,
+        version: incoming.version || 2
+      };
+      migrateShailuData();
+      await saveData(DATA);
+      showToast("Backup restored successfully.");
+      setView("home");
+    }catch(err){
+      showToast("Could not read backup file.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- Excel (.xlsx) export / import — same data, spreadsheet form ---------- */
+function exportExcel(){
+  if (typeof XLSX === "undefined"){
+    showToast("Excel library failed to load — check your internet connection and try again.");
+    return;
+  }
+  var custRows = DATA.customers.map(function(c){
+    return {
+      "Customer ID": c.id,
+      "Name": c.name,
+      "Mobile": c.mobile,
+      "Principal Amount": c.principal,
+      "20% Cut (reference)": twentyPercentCut(c.principal),
+      "Start Date": c.startDate,
+      "Collection Period (days)": c.period,
+      "Daily Amount": c.dailyAmount,
+      "Custom Penalty/Day": c.penaltyPerDay != null ? c.penaltyPerDay : "",
+      "Status": c.status || "active",
+      "Archived": c.archived ? "Yes" : "No",
+      "Notes": c.notes || "",
+      "Created At": c.createdAt ? new Date(c.createdAt).toISOString() : "",
+      "Person ID": c.personId || "",
+      "Book ID": c.bookId || "",
+      "Book No": c.bookNo || "",
+      "Book Title": c.bookTitle || ""
+    };
+  });
+  var txnRows = [];
+  DATA.customers.forEach(function(c){
+    (DATA.transactions[c.id] || []).forEach(function(t){
+      txnRows.push({
+        "Customer ID": c.id,
+        "Customer Name": c.name,
+        "Txn ID": t.id || "",
+        "Reversal For": t.reversalForId || "",
+        "Day Number": t.dayNumber,
+        "Amount Paid": t.amountPaid,
+        "Penalty Paid": t.penaltyPaid || 0,
+        "Date": t.date,
+        "Timestamp": t.timestamp ? new Date(t.timestamp).toISOString() : "",
+        "Is Correction": t.isCorrection ? "Yes" : "No",
+        "Note": t.note || ""
+      });
+    });
+  });
+  var trashRows = (DATA.trash || []).map(function(item){
+    var c = item.customer || {};
+    return {
+      "Customer ID": c.id,
+      "Name": c.name,
+      "Mobile": c.mobile,
+      "Principal Amount": c.principal,
+      "Start Date": c.startDate,
+      "Collection Period (days)": c.period,
+      "Daily Amount": c.dailyAmount,
+      "Notes": c.notes || ""
+    };
+  });
+  var trashTxnRows = [];
+  (DATA.trash || []).forEach(function(item){
+    var c = item.customer || {};
+    (item.transactions || []).forEach(function(t){
+      trashTxnRows.push({
+        "Customer ID": c.id, "Day Number": t.dayNumber, "Amount Paid": t.amountPaid,
+        "Penalty Paid": t.penaltyPaid || 0, "Date": t.date,
+        "Timestamp": t.timestamp ? new Date(t.timestamp).toISOString() : "",
+        "Is Correction": t.isCorrection ? "Yes" : "No", "Note": t.note || ""
+      });
+    });
+  });
+  var expenseRows = (DATA.expenses || []).map(function(e){
+    return {
+      "Name": e.name,
+      "Amount": e.amount,
+      "Date": e.date,
+      "Timestamp": e.timestamp ? new Date(e.timestamp).toISOString() : ""
+    };
+  });
+
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(custRows), "Customers");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(txnRows), "Transactions");
+  if (trashRows.length){
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(trashRows), "Trash");
+  }
+  if (trashTxnRows.length){
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(trashTxnRows), "Trash Transactions");
+  }
+  if (expenseRows.length){
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expenseRows), "Expenses");
+  }
+  var xout = XLSX.write(wb, {bookType:"xlsx", type:"array"});
+  var xblob = new Blob([xout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  saveFileCompat("collection-data-" + todayISO() + ".xlsx", xblob, "Excel file exported.");
+}
+
+function importExcel(file){
+  if (!file){ showToast("Choose an Excel (.xlsx) file first."); return; }
+  if (typeof XLSX === "undefined"){
+    showToast("Excel library failed to load — check your internet connection and try again.");
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = async function(e){
+    try{
+      var wb = XLSX.read(new Uint8Array(e.target.result), {type:"array"});
+      var custSheet = wb.Sheets["Customers"];
+      if (!custSheet){
+        showToast("This Excel file has no 'Customers' sheet — is it a valid export?");
+        return;
+      }
+      var custRows = XLSX.utils.sheet_to_json(custSheet, {defval:""});
+      var newCustomers = custRows.map(function(r){
+        return {
+          id: safeId(r["Customer ID"]) || uid("cust"),
+          name: String(r["Name"] || "").trim(),
+          mobile: String(r["Mobile"] || "").trim(),
+          principal: round2(parseFloat(r["Principal Amount"]) || 0),
+          startDate: sanitizeDateStr(r["Start Date"], todayISO()),
+          period: Math.max(1, Math.round(parseFloat(r["Collection Period (days)"]) || 1)),
+          dailyAmount: round2(parseFloat(r["Daily Amount"]) || 0),
+          penaltyPerDay: (r["Custom Penalty/Day"] === "" || r["Custom Penalty/Day"] == null) ? null : round2(parseFloat(r["Custom Penalty/Day"]) || 0),
+          personId: String(r["Person ID"] || "") || undefined,
+          bookId: String(r["Book ID"] || "") || undefined,
+          bookNo: String(r["Book No"] || "") || undefined,
+          bookTitle: String(r["Book Title"] || "") || undefined,
+          status: String(r["Status"] || "active"),
+          archived: String(r["Archived"] || "No").toLowerCase() === "yes",
+          notes: String(r["Notes"] || ""),
+          createdAt: parseTs(r["Created At"])
+        };
+      });
+
+      var newTransactions = {};
+      var txnSheet = wb.Sheets["Transactions"];
+      if (txnSheet){
+        var txnRows = XLSX.utils.sheet_to_json(txnSheet, {defval:""});
+        txnRows.forEach(function(r){
+          var cid = safeId(r["Customer ID"]);
+          if (!cid) return;
+          if (!newTransactions[cid]) newTransactions[cid] = [];
+          newTransactions[cid].push({
+            id: safeId(r["Txn ID"]) || uid("txn"),
+            dayNumber: Math.round(parseFloat(r["Day Number"]) || 0),
+            amountPaid: round2(parseFloat(r["Amount Paid"]) || 0),
+            penaltyPaid: round2(parseFloat(r["Penalty Paid"]) || 0),
+            date: sanitizeDateStr(r["Date"], String(r["Date"] || "")),
+            timestamp: parseTs(r["Timestamp"]),
+            isCorrection: String(r["Is Correction"] || "No").toLowerCase() === "yes",
+            note: String(r["Note"] || ""),
+            reversalForId: safeId(r["Reversal For"]) || undefined
+          });
+        });
+      }
+
+      var newTrash = [];
+      var trashSheet = wb.Sheets["Trash"];
+      if (trashSheet){
+        var trashRows = XLSX.utils.sheet_to_json(trashSheet, {defval:""});
+        var trashTxnSheet = wb.Sheets["Trash Transactions"];
+        var trashTxnByCustomer = {};
+        if (trashTxnSheet){
+          XLSX.utils.sheet_to_json(trashTxnSheet, {defval:""}).forEach(function(r){
+            var cid=safeId(r["Customer ID"]); if(!cid) return;
+            if(!trashTxnByCustomer[cid]) trashTxnByCustomer[cid]=[];
+            trashTxnByCustomer[cid].push({id:uid("txn"),dayNumber:Math.round(parseFloat(r["Day Number"])||0),amountPaid:round2(parseFloat(r["Amount Paid"])||0),penaltyPaid:round2(parseFloat(r["Penalty Paid"])||0),date:sanitizeDateStr(r["Date"],String(r["Date"]||"")),timestamp:parseTs(r["Timestamp"]),isCorrection:String(r["Is Correction"]||"No").toLowerCase()==="yes",note:String(r["Note"]||"")});
+          });
+        }
+        newTrash = trashRows.map(function(r){
+          var cid=safeId(r["Customer ID"])||uid("cust");
+          return {
+            customer: {id:cid,name:String(r["Name"]||"").trim(),mobile:String(r["Mobile"]||"").trim(),principal:round2(parseFloat(r["Principal Amount"])||0),startDate:sanitizeDateStr(r["Start Date"],todayISO()),period:Math.max(1,Math.round(parseFloat(r["Collection Period (days)"])||1)),dailyAmount:round2(parseFloat(r["Daily Amount"])||0),status:"active",archived:false,notes:String(r["Notes"]||""),createdAt:parseTs(r["Created At"])},
+            transactions: trashTxnByCustomer[cid] || [], deletedAt: Date.now()
+          };
+        });
+      }
+
+      var newExpenses = [];
+      var expenseSheet = wb.Sheets["Expenses"];
+      if (expenseSheet){
+        var expenseRows = XLSX.utils.sheet_to_json(expenseSheet, {defval:""});
+        newExpenses = expenseRows.map(function(r){
+          return {
+            id: uid("exp"),
+            name: String(r["Name"] || "").trim(),
+            amount: round2(parseFloat(r["Amount"]) || 0),
+            date: sanitizeDateStr(r["Date"], todayISO()),
+            timestamp: parseTs(r["Timestamp"])
+          };
+        });
+      }
+
+      var proceed = confirm("Restoring from Excel will replace all current data. Continue?");
+      if (!proceed) return;
+
+      DATA = {
+        customers: newCustomers,
+        transactions: newTransactions,
+        trash: newTrash,
+        expenses: newExpenses,
+        expenseTrash: DATA.expenseTrash || [], // Excel has no Expense-Trash sheet — keep what was already there instead of wiping it
+        settings: DATA.settings,
+        version: DATA.version || 2
+      };
+      migrateShailuData();
+      await saveData(DATA);
+      showToast("Data restored from Excel successfully.");
+      setView("home");
+    }catch(err){
+      console.error(err);
+      showToast("Could not read that Excel file — is it a valid export?");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ============================= EVENT DELEGATION ============================= */
+function attachGlobalHandlers(){
+  document.querySelectorAll("[data-nav]").forEach(function(el){
+    el.addEventListener("click", function(){ setView(el.getAttribute("data-nav")); });
+  });
+  document.querySelectorAll("[data-open-customer]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      // Any nested action button (edit, trash, mark-paid, whatsapp link, etc.)
+      // inside a data-open-customer card must not also trigger the card's
+      // own "open full detail" navigation via bubbling.
+      if (ev.target.closest("[data-mark-paid], [data-receive-due], [data-edit-customer], [data-move-trash], [data-archive], [data-unarchive], [data-mark-unpaid], .wa-link")) return;
+      // Some cards also contain their own nested "View Ledger"/"Ledger" button
+      // that carries this same data-open-customer attribute. Without this
+      // check, clicking that button fired its own listener AND (via bubbling)
+      // the parent card's listener too, calling setView() twice and pushing
+      // two history entries for one tap — which made Back need two presses.
+      if (ev.target.closest("[data-open-customer]") !== el) return;
+      setView("customerDetail", el.getAttribute("data-open-customer"));
+    });
+  });
+  document.querySelectorAll("[data-edit-customer]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      setView("editCustomer", el.getAttribute("data-edit-customer"));
+    });
+  });
+  document.querySelectorAll("[data-receive-due]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      openReceiveDueModal(el.getAttribute("data-receive-due"));
+    });
+  });
+  document.querySelectorAll("[data-mark-paid]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      openMarkPaidModal(el.getAttribute("data-mark-paid"));
+    });
+  });
+  document.querySelectorAll("[data-mark-unpaid]").forEach(function(el){
+    el.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      var txnId = el.getAttribute("data-mark-unpaid");
+      var custId = el.getAttribute("data-cust-id");
+      markTransactionUnpaid(custId, txnId);
+    });
+  });
+  var openRemindersBtn = document.getElementById("openRemindersBtn");
+  if (openRemindersBtn){
+    openRemindersBtn.addEventListener("click", function(){
+      openRemindersModal();
+    });
+  }
+  document.querySelectorAll("[data-archive]").forEach(function(el){
+    el.addEventListener("click", async function(){
+      var ok = confirm("Archive this customer?");
+      if (!ok) return;
+      await archiveCustomer(el.getAttribute("data-archive"), true);
+      showToast("Customer archived.");
+      setView("customers");
+    });
+  });
+  document.querySelectorAll("[data-unarchive]").forEach(function(el){
+    el.addEventListener("click", async function(){
+      await archiveCustomer(el.getAttribute("data-unarchive"), false);
+      showToast("Customer restored.");
+      setView("customerDetail", el.getAttribute("data-unarchive"));
+    });
+  });
+  document.querySelectorAll("[data-move-trash]").forEach(function(el){
+    el.addEventListener("click", async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (el.disabled) return;
+      var ok = confirm("Move this customer to trash bin?");
+      if (!ok) return;
+      el.disabled = true;
+      var originalText = el.textContent;
+      el.textContent = "Moving...";
+      try {
+        var result = await moveToTrash(el.getAttribute("data-move-trash"));
+        if (result && result.ok){
+          showToast("Customer moved to trash.");
+          setView("customers");
+        } else {
+          el.disabled = false;
+          el.textContent = originalText;
+          showToast("Could not move customer to trash. Nothing was deleted.");
+        }
+      } catch(err){
+        console.error("Move to trash failed:", err);
+        el.disabled = false;
+        el.textContent = originalText;
+        showToast("Could not move customer to trash. Please try again.");
+      }
+    });
+  });
+  document.querySelectorAll("[data-restore-trash]").forEach(function(el){
+    el.addEventListener("click", async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (el.disabled) return;
+      var idx = parseInt(el.getAttribute("data-restore-trash"), 10);
+      if (isNaN(idx)) { showToast("Invalid trash item."); return; }
+      el.disabled = true;
+      var originalText = el.textContent;
+      el.textContent = "Restoring...";
+      try {
+        var result = await restoreFromTrash(idx);
+        if (result && result.ok){
+          showToast("Customer restored from trash.");
+          render();
+        } else {
+          el.disabled = false;
+          el.textContent = originalText;
+          showToast("Could not restore customer. Please try again.");
+        }
+      } catch(err){
+        console.error("Restore from trash failed:", err);
+        el.disabled = false;
+        el.textContent = originalText;
+        showToast("Could not restore customer. Please try again.");
+      }
+    });
+  });
+  document.querySelectorAll("[data-delete-trash]").forEach(function(el){
+    el.addEventListener("click", async function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (el.disabled) return;
+      var ok = confirm("Delete permanently from trash?");
+      if (!ok) return;
+      var idx = parseInt(el.getAttribute("data-delete-trash"), 10);
+      if (isNaN(idx)) { showToast("Invalid trash item."); return; }
+      el.disabled = true;
+      var originalText = el.textContent;
+      el.textContent = "Deleting...";
+      try {
+        var result = await deletePermanently(idx);
+        if (result && result.ok){
+          showToast("Deleted permanently.");
+          render();
+        } else {
+          el.disabled = false;
+          el.textContent = originalText;
+          showToast("Could not delete permanently. Please try again.");
+        }
+      } catch(err){
+        console.error("Permanent delete failed:", err);
+        el.disabled = false;
+        el.textContent = originalText;
+        showToast("Could not delete permanently. Please try again.");
+      }
+    });
+  });
+  var addExpenseBtn = document.getElementById("addExpenseBtn");
+  if (addExpenseBtn){
+    addExpenseBtn.addEventListener("click", async function(){
+      var nameEl = document.getElementById("exp_name");
+      var amountEl = document.getElementById("exp_amount");
+      var name = nameEl.value.trim();
+      var amount = parseFloat(amountEl.value);
+      if (!name){ showToast("Enter what the expense was for."); return; }
+      if (!amount || amount <= 0){ showToast("Enter a valid amount."); return; }
+      var btn = this;
+      btn.disabled = true;
+      var addedExp = await addExpense(name, amount);
+      btn.disabled = false;
+      if (!addedExp) return;
+      showToast("Added to expense diary.");
+      render();
+    });
+  }
+  document.querySelectorAll("[data-delete-expense]").forEach(function(el){
+    el.addEventListener("click", async function(){
+      var ok = confirm("Move this expense to the recovery bin? You can restore it later.");
+      if (!ok) return;
+      await deleteExpense(el.getAttribute("data-delete-expense"));
+      showToast("Moved to recovery bin.");
+      render();
+    });
+  });
+  document.querySelectorAll("[data-restore-expense]").forEach(function(el){
+    el.addEventListener("click", async function(){
+      var idx = parseInt(el.getAttribute("data-restore-expense"), 10);
+      await restoreExpense(idx);
+      showToast("Expense restored.");
+      render();
+    });
+  });
+  document.querySelectorAll("[data-delete-expense-forever]").forEach(function(el){
+    el.addEventListener("click", async function(){
+      var ok = confirm("Delete this expense permanently? This cannot be undone.");
+      if (!ok) return;
+      var idx = parseInt(el.getAttribute("data-delete-expense-forever"), 10);
+      await deleteExpensePermanently(idx);
+      showToast("Deleted permanently.");
+      render();
+    });
+  });
+  var sendExpenseWaBtn = document.getElementById("sendExpenseWaBtn");
+  if (sendExpenseWaBtn){
+    sendExpenseWaBtn.addEventListener("click", function(){
+      var num = document.getElementById("expWaNumber").value.trim();
+      if (!validateMobile(num)){
+        showToast("Enter a valid mobile number.");
+        return;
+      }
+      var link = waLink(num, expenseWaMessage());
+      openExternal(link);
+    });
+  }
+  document.querySelectorAll("[data-msgtype]").forEach(function(el){
+    el.addEventListener("click", function(){
+      COLLECTION_MSG_TYPE = el.getAttribute("data-msgtype");
+      render();
+    });
+  });
+  var sendCollectionWaBtn = document.getElementById("sendCollectionWaBtn");
+  if (sendCollectionWaBtn){
+    sendCollectionWaBtn.addEventListener("click", async function(){
+      var num = document.getElementById("collWaNumber").value.trim();
+      if (!validateMobile(num)){
+        showToast("Enter a valid mobile number.");
+        return;
+      }
+      await maybeSaveCollectionDefaultNumber(num);
+      var link = waLink(num, getSelectedCollectionMessage());
+      openExternal(link);
+    });
+  }
+  var quickSendCollectionBtn = document.getElementById("quickSendCollectionBtn");
+  if (quickSendCollectionBtn){
+    quickSendCollectionBtn.addEventListener("click", function(){
+      var num = (DATA.settings && DATA.settings.defaultCollectionNumber) || "";
+      if (!validateMobile(num)){
+        showToast("Saved number looks invalid — update it in Settings.");
+        return;
+      }
+      var link = waLink(num, getSelectedCollectionMessage());
+      openExternal(link);
+    });
+  }
+  var copyCollectionBtn = document.getElementById("copyCollectionBtn");
+  if (copyCollectionBtn){
+    copyCollectionBtn.addEventListener("click", async function(){
+      var ok = await copyTextToClipboard(getSelectedCollectionMessage());
+      showToast(ok ? "Message copied — paste it anywhere." : "Could not copy. Please try again.");
+    });
+  }
+  var shareCollectionBtn = document.getElementById("shareCollectionBtn");
+  if (shareCollectionBtn){
+    shareCollectionBtn.addEventListener("click", async function(){
+      var msg = getSelectedCollectionMessage();
+      if (window.AndroidBridge && window.AndroidBridge.shareText){
+        try { window.AndroidBridge.shareText(msg, "Today's Collection Summary"); } catch(e){ showToast("Could not open share sheet."); }
+        return;
+      }
+      if (navigator.share){
+        try {
+          await navigator.share({ text: msg, title: "Today's Collection Summary" });
+        } catch(e){ /* user cancelled share sheet — no action needed */ }
+      } else {
+        var ok = await copyTextToClipboard(msg);
+        showToast(ok ? "Sharing isn't supported here — message copied instead." : "Could not share or copy.");
+      }
+    });
+  }
+  document.querySelectorAll("[data-filter]").forEach(function(el){
+    el.addEventListener("click", function(){
+      CUSTOMER_FILTER = el.getAttribute("data-filter");
+      CUSTOMER_LIST_LIMIT = 50;
+      render();
+    });
+  });
+
+  var loadMoreBtn = document.getElementById("loadMoreBtn");
+  if (loadMoreBtn){
+    loadMoreBtn.addEventListener("click", function(){
+      CUSTOMER_LIST_LIMIT += 50;
+      render();
+    });
+  }
+
+  var searchInput = document.getElementById("searchInput");
+  if (searchInput){
+    searchInput.addEventListener("input", function(){
+      SEARCH_Q = this.value;
+      var caret = this.selectionStart;
+      render();
+      var again = document.getElementById("searchInput");
+      if (again){ again.focus(); again.setSelectionRange(caret, caret); }
+    });
+  }
+  var historySearchInput = document.getElementById("historySearchInput");
+  if (historySearchInput){
+    historySearchInput.addEventListener("input", function(){
+      HISTORY_Q = this.value;
+      var caret2 = this.selectionStart;
+      render();
+      var again2 = document.getElementById("historySearchInput");
+      if (again2){ again2.focus(); again2.setSelectionRange(caret2, caret2); }
+    });
+  }
+  var reportMonthInput = document.getElementById("reportMonthInput");
+  if (reportMonthInput){
+    reportMonthInput.addEventListener("change", function(){
+      REPORTS_MONTH = this.value;
+      render();
+    });
+  }
+  var saveBtn = document.getElementById("saveSettingsBtn");
+  if (saveBtn){
+    saveBtn.addEventListener("click", async function(){
+      var penalty = parseFloat(document.getElementById("setPenalty").value) || 0;
+      var cc = document.getElementById("setCountryCode").value.trim() || "91";
+      var waPaid = document.getElementById("setWaPaid").value;
+      var waDue = document.getElementById("setWaDue").value;
+      var defaultCollNumEl = document.getElementById("setDefaultCollNumber");
+      var defaultCollNum = defaultCollNumEl ? defaultCollNumEl.value.trim() : (DATA.settings.defaultCollectionNumber || "");
+      if (defaultCollNum && !validateMobile(defaultCollNum)){
+        showToast("Default collection number looks invalid — check and try again.");
+        return;
+      }
+      await saveSettings({
+        penaltyPerDay: penalty, 
+        countryCode: cc,
+        waPaidTemplate: waPaid,
+        waDueTemplate: waDue,
+        defaultCollectionNumber: defaultCollNum
+      });
+      showToast("Settings saved.");
+      render();
+    });
+  }
+  var exportBtn = document.getElementById("exportBtn");
+  if (exportBtn) exportBtn.addEventListener("click", exportBackup);
+  var importBtn = document.getElementById("importBtn");
+  if (importBtn){
+    importBtn.addEventListener("click", function(){
+      var f = document.getElementById("importFile").files[0];
+      importBackup(f);
+    });
+  }
+  var exportExcelBtn = document.getElementById("exportExcelBtn");
+  if (exportExcelBtn) exportExcelBtn.addEventListener("click", exportExcel);
+  var importExcelBtn = document.getElementById("importExcelBtn");
+  if (importExcelBtn){
+    importExcelBtn.addEventListener("click", function(){
+      var f = document.getElementById("importExcelFile").files[0];
+      importExcel(f);
+    });
+  }
+}
+
+/* ============================= SHAILU BHAI PRO UPGRADE ============================= */
+function migrateShailuData(){
+  if (!DATA) return;
+  if (!DATA.settings) DATA.settings = defaultData().settings;
+  if (!DATA.customers) DATA.customers = [];
+  if (!DATA.transactions) DATA.transactions = {};
+  if (!DATA.trash) DATA.trash = [];
+  if (!DATA.expenses) DATA.expenses = [];
+  if (!DATA.expenseTrash) DATA.expenseTrash = [];
+  var changed = false;
+  DATA.customers.forEach(function(c, i){
+    if (!c.personId){ c.personId = 'person_' + String((c.mobile||'').replace(/\D/g,'')) + '_' + (c.createdAt || i); changed = true; }
+    if (!c.bookId){ c.bookId = c.id; changed = true; }
+    if (!c.bookNo){ c.bookNo = 'BOOK-' + String(i+1).padStart(4,'0'); changed = true; }
+    if (!c.bookTitle){ c.bookTitle = 'Loan / Book'; changed = true; }
+  });
+  (DATA.trash||[]).forEach(function(item, i){
+    var c=item.customer||{};
+    if (!c.personId) c.personId='person_'+String((c.mobile||'').replace(/\D/g,''))+'_trash_'+i;
+    if (!c.bookId) c.bookId=c.id||uid('book');
+    if (!c.bookNo) c.bookNo='TRASH-'+String(i+1).padStart(4,'0');
+  });
+  var maxBook = 0;
+  DATA.customers.forEach(function(c){
+    var m = /(\d+)\s*$/.exec(String(c.bookNo || ""));
+    if (m) maxBook = Math.max(maxBook, parseInt(m[1], 10));
+    c.startDate = sanitizeDateStr(c.startDate, todayISO());
+    c.period = Math.max(1, Math.round(Number(c.period)) || 1);
+    c.principal = Number(c.principal) || 0;
+    c.dailyAmount = Number(c.dailyAmount) || 0;
+    if (!Array.isArray(DATA.transactions[c.id])) DATA.transactions[c.id] = [];
+  });
+  DATA.nextBookNo = Math.max(Number(DATA.nextBookNo) || 0, maxBook + 1, DATA.customers.length + 1);
+  DATA.version = Math.max(Number(DATA.version||0), 5);
+  return changed;
+}
+
+function uniquePeopleCount(list){
+  var seen={}; (list||[]).forEach(function(c){ if(c && c.archived!==true) seen[c.personId||c.id]=true; });
+  return Object.keys(seen).length;
+}
+function personLoans(c){
+  if(!c) return [];
+  return DATA.customers.filter(function(x){ return (x.personId||x.id)===(c.personId||c.id); }).sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
+}
+function nextBookNumber(){
+  var n=Number(DATA.nextBookNo||1); DATA.nextBookNo=n+1; return 'BOOK-'+String(n).padStart(4,'0');
+}
+async function addBookForCustomer(sourceId, payload){
+  if (!beginMutation()) return null;
+  try{
+    var source=DATA.customers.find(function(x){return x.id===sourceId;});
+    var principal=round2(Number(payload.principal)), daily=round2(Number(payload.dailyAmount));
+    if(!source || !validateMobile(payload.mobile) || !validMoneyAmount(principal,false) || !validMoneyAmount(daily,false)){
+      showToast("Please enter valid book details and amounts (maximum ₹1 crore).");
+      return null;
+    }
+    var c={
+      id:uid('cust'), personId:source.personId||source.id, bookId:uid('book'), bookNo:nextBookNumber(),
+      bookTitle:(payload.bookTitle||'Loan / Book').trim(), name:payload.name.trim(), mobile:payload.mobile.trim(),
+      principal:principal, startDate:sanitizeDateStr(payload.startDate,todayISO()),
+      period:Math.max(1,Math.round(payload.period)||1), dailyAmount:daily,
+      penaltyPerDay:normalizePenaltyOverride(payload.penaltyPerDay), notes:payload.notes?payload.notes.trim():'',
+      status:'active', archived:false, createdAt:Date.now(), reopenedFrom:source.id
+    };
+    DATA.customers.push(c); DATA.transactions[c.id]=[];
+    var saved=await saveData(DATA);
+    if(!saved){ DATA.customers.pop(); delete DATA.transactions[c.id]; return null; }
+    return c;
+  } finally { endMutation(); }
+}
+
+function shailuTodayRows(){
+  var paid=[], pending=[];
+  activeCustomers().forEach(function(c){
+    var txns=DATA.transactions[c.id]||[], s=computeStats(c,txns,DATA.settings);
+    var todayTx=txns.filter(function(t){return t.date===todayISO();});
+    var amt=round2(todayTx.reduce(function(a,t){return a+(t.amountPaid||0);},0));
+    var pen=round2(todayTx.reduce(function(a,t){return a+(t.penaltyPaid||0);},0));
+    if(amt>0.004){
+      var originals=todayTx.filter(function(t){ return !t.isCorrection && !isReversedTxn(txns,t); }).sort(function(a,b){ return (b.timestamp||0)-(a.timestamp||0); });
+      paid.push({
+        c:c,
+        s:s,
+        amount:amt,
+        penalty:pen,
+        timestamp: todayTx.length ? Math.max.apply(null, todayTx.map(function(t){ return t.timestamp||0; })) : Date.now(),
+        days: originals.map(function(t){ return t.dayNumber; }).sort(function(a,b){ return a-b; }),
+        lastTxnId: originals.length ? originals[0].id : null
+      });
+    }
+    if(s.hasStarted && !s.isCompleted && s.todaysDue) pending.push({c:c,s:s});
+  });
+  return {paid:paid,pending:pending};
+}
+
+function last15DayRows(){
+  var out=[]; var base=new Date(); base.setHours(0,0,0,0);
+  for(var i=0;i<15;i++){
+    var d=new Date(base); d.setDate(base.getDate()-i); var iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var total=0,count=0,pen=0;
+    DATA.customers.forEach(function(c){ var arr=DATA.transactions[c.id]||[]; arr.forEach(function(t){ if(t.date===iso){ total+=(t.amountPaid||0); pen+=(t.penaltyPaid||0); if(!t.isCorrection && (t.amountPaid||0)>0 && !isReversedTxn(arr,t)) count++; } }); });
+    var exp=(DATA.expenses||[]).filter(function(e){return e.date===iso;}).reduce(function(a,e){return a+(e.amount||0);},0);
+    out.push({date:iso,total:round2(total),count:count,penalty:round2(pen),expense:round2(exp),net:round2(total-exp)});
+  }
+  return out;
+}
+
+function todayTotals(){
+  var totalCollectedToday=0,totalPendingToday=0,totalPenaltyCollectedToday=0,totalPenaltyLiveToday=0,customersDueToday=0;
+  var totalPrincipal=0,totalCollectedAll=0,totalPendingAll=0,totalPenaltyAll=0;
+  activeCustomers().forEach(function(c){
+    var tx=DATA.transactions[c.id]||[],s=computeStats(c,tx,DATA.settings);
+    totalPrincipal+=c.principal; totalCollectedAll+=s.totalCollected; totalPendingAll+=s.totalPending; totalPenaltyAll+=s.penaltyDue;
+    if(s.hasStarted&&!s.isCompleted&&s.todaysDue){customersDueToday++;totalPendingToday+=s.todaysDueAmount;totalPenaltyLiveToday+=s.penaltyDue;}
+    tx.filter(function(t){return t.date===todayISO();}).forEach(function(t){totalCollectedToday+=t.amountPaid||0;totalPenaltyCollectedToday+=t.penaltyPaid||0;});
+  });
+  var expensesToday=(DATA.expenses||[]).filter(function(e){return e.date===todayISO();}).reduce(function(a,e){return a+(e.amount||0);},0);
+  var due=round2(totalCollectedToday+totalPendingToday),col=round2(totalCollectedToday),net=round2(col-expensesToday);
+  return {customersDueToday:customersDueToday,totalDueToday:due,totalCollected:col,totalPendingToday:round2(totalPendingToday),totalPenaltyToday:round2(totalPenaltyLiveToday+totalPenaltyCollectedToday),collectionPercent:due>0?round2(col/due*100):(col>0?100:0),totalPrincipal:round2(totalPrincipal),totalCollectedAll:round2(totalCollectedAll),totalPendingAll:round2(totalPendingAll),totalPenaltyAll:round2(totalPenaltyAll),totalOutstandingAll:round2(totalPendingAll+totalPenaltyAll),expensesToday:round2(expensesToday),netCashToday:net,marketOutstanding:round2(totalPendingAll+totalPenaltyAll),uniqueCustomers:uniquePeopleCount(activeCustomers()),loanCount:activeCustomers().length};
+}
+
+function renderNav(){
+  function item(v,icon,label){var active=(VIEW===v||(VIEW==='customerDetail'&&v==='customers')||(VIEW==='addCustomer'&&v==='customers')||(VIEW==='editCustomer'&&v==='customers'))?' active':'';return '<button class="navitem'+active+'" data-nav="'+v+'"><span class="ic">'+icon+'</span>'+label+'</button>';}
+  return '<div class="navbar">'+item('home','🏠','Home')+item('customers','👥','Customers')+item('history','📚','History')+item('reports','📊','Reports')+item('settings','⚙️','Settings')+'</div>'+((VIEW==='home'||VIEW==='customers')?'<button class="fab" data-nav="addCustomer">+</button>':'');
+}
+
+function renderView(){
+  if(VIEW==='home') return renderHome(); if(VIEW==='customers') return renderCustomers(); if(VIEW==='history') return renderHistory(); if(VIEW==='expenses') return renderExpenses(); if(VIEW==='trash') return renderTrash(); if(VIEW==='reports') return renderReports(); if(VIEW==='settings') return renderSettings(); if(VIEW==='message') return renderMessageCenter(); return renderHome();
+}
+
+function renderHome(){
+  var t=todayTotals(), rows=shailuTodayRows(), days=last15DayRows(), html='';
+  html+='<div class="card" style="background:var(--brand);color:#fff;border:none;">'+
+    '<div style="font-size:11.5px;color:#BFE0D8;text-transform:uppercase;letter-spacing:.05em;">Today\'s Money</div>'+
+    '<div style="font-family:\'Fraunces\',serif;font-size:30px;font-weight:700;margin-top:3px;color:#fff;">'+inr(t.totalCollected)+'</div>'+
+    '<div style="font-size:12px;color:#BFE0D8;margin-top:2px;">Cash collected today</div>'+
+    '<div class="grid2" style="margin-top:14px;">'+
+      '<div><div style="font-size:11px;color:#BFE0D8;">Due</div><div style="font-weight:700;font-size:16px;">'+inr(t.totalDueToday)+'</div></div>'+
+      '<div><div style="font-size:11px;color:#BFE0D8;">Pending</div><div style="font-weight:700;font-size:16px;">'+inr(t.totalPendingToday)+'</div></div>'+
+      '<div><div style="font-size:11px;color:#BFE0D8;">Net Cash</div><div style="font-weight:700;font-size:16px;">'+inr(t.netCashToday)+'</div></div>'+
+      '<div><div style="font-size:11px;color:#BFE0D8;">Expense</div><div style="font-weight:700;font-size:16px;">'+inr(t.expensesToday)+'</div></div>'+
+    '</div>'+
+    '<div class="btnrow"><button class="btn" style="background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.18);" data-nav="message">📲 Message Center</button></div>'+
+    '<div class="btnrow"><button class="btn" style="background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.18);" data-nav="expenses">💵 Expense Diary</button></div>'+
+  '</div>';
+  html+='<div class="grid2">'+statCard('Due Customers',t.customersDueToday)+statCard('Total Customers',t.uniqueCustomers)+'</div>';
+  html+='<div class="grid2">'+statCard('Active Loans',t.loanCount)+statCard('Market Outstanding',inr(t.marketOutstanding))+'</div>';
+  html+='<div class="section-title">Last 15 Days</div><div class="card last15-card">';
+  html+='<button class="last15-toggle" type="button" data-toggle-last15="1"><span>📅 Last 15 Days</span><span class="last15-plus">+</span></button>';
+  html+='<div class="last15-body" id="last15Body">';
+  days.forEach(function(d){html+='<div class="day-row"><div><b>'+fmtDate(d.date)+'</b><div class="sub">'+d.count+' payment(s) · Expense '+inr(d.expense)+'</div></div><div style="text-align:right"><b>'+inr(d.total)+'</b><div class="sub">Net '+inr(d.net)+'</div></div></div>';});
+  html+='</div></div>';
+  html+='<div class="section-title">Quick Actions</div><div class="card"><div class="feature-grid">'+
+    '<button class="btn btn-primary feature-btn" data-nav="addCustomer">➕ Add Customer</button>'+
+    '<button class="btn btn-outline feature-btn" data-nav="customers">🔍 Search</button>'+
+    '<button class="btn btn-outline feature-btn" data-nav="history">📚 History</button>'+
+    '<button class="btn btn-outline feature-btn" data-nav="reports">📊 Reports</button>'+
+    '<button class="btn btn-outline feature-btn" data-nav="expenses">💵 Expenses</button>'+
+    '<button class="btn btn-wa-due feature-btn" id="openRemindersBtn">📨 Reminders</button>'+
+  '</div></div>';
+  html+='<div class="section-title">Today\'s Collection</div>';
+  html+=rows.paid.length?rows.paid.slice(0,20).map(function(r){return paidCard(r.c,r.s,{amountPaid:r.amount,penaltyPaid:r.penalty,timestamp:r.timestamp,days:r.days,lastTxnId:r.lastTxnId});}).join(''):'<div class="card empty">No payments recorded today.</div>';
+  html+='<div class="section-title">Pending Today ('+rows.pending.length+')</div>';
+  html+=rows.pending.length?rows.pending.slice(0,20).map(function(r){return pendingCard(r.c,r.s);}).join(''):'<div class="card empty">Nothing pending today.</div>';
+  return html;
+}
+
+function renderCustomers(){
+  var q=SEARCH_Q.trim().toLowerCase(), list=DATA.customers.filter(function(c){
+    var s=computeStats(c,DATA.transactions[c.id]||[],DATA.settings);
+    if(CUSTOMER_FILTER==='active'&&(c.archived||s.isCompleted)) return false;
+    if(CUSTOMER_FILTER==='completed'&&!s.isCompleted)return false;
+    if(CUSTOMER_FILTER==='pending'&&!(s.hasStarted&&s.todaysDue&&!s.isCompleted))return false;
+    if(CUSTOMER_FILTER==='archived'&&!c.archived)return false;
+    if(CUSTOMER_FILTER==='all'&&c.archived)return false;
+    if(q){var hay=(c.name+' '+c.mobile+' '+c.id+' '+(c.bookNo||'')).toLowerCase();if(hay.indexOf(q)<0)return false;}
+    return true;
+  }).sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
+  var html='<div class="searchbar"><input type="text" id="searchInput" placeholder="Search by name, mobile, ID or Book No." value="'+escapeHtml(SEARCH_Q)+'"></div><div class="filterrow">';
+  [['all','All'],['active','Active'],['pending','Pending Today'],['completed','Completed'],['archived','Archived']].forEach(function(f){html+='<button class="chip'+(CUSTOMER_FILTER===f[0]?' active':'')+'" data-filter="'+f[0]+'">'+f[1]+'</button>';});
+  html+='</div>';
+  if(!list.length) html+='<div class="card empty">No customers match this view.</div>';
+  list.slice(0,CUSTOMER_LIST_LIMIT).forEach(function(c){
+    var s=computeStats(c,DATA.transactions[c.id]||[],DATA.settings), loans=personLoans(c), badge=c.archived?'<span class="badge" style="background:#EEE;color:#888;">ARCHIVED</span>':s.isCompleted?'<span class="badge paid">COMPLETED</span>':(s.hasStarted&&s.todaysDue?'<span class="badge due">DUE</span>':'<span class="badge paid">OK</span>');
+    html+='<div class="card" data-open-customer="'+c.id+'"><div class="crow"><div><div class="name">'+escapeHtml(c.name)+' <span class="loan-tag">'+escapeHtml(c.bookNo||'BOOK')+'</span></div><div class="sub">'+escapeHtml(c.mobile)+' · Principal '+inr(c.principal)+'</div></div>'+badge+'</div><div class="sub" style="margin-top:6px;">Outstanding: '+inr(s.totalOutstanding)+' · Day '+s.currentDayNumber+'/'+c.period+' · '+loans.length+' book(s)</div><div class="btnrow"><button class="btn btn-outline btn-small" data-open-customer="'+c.id+'">📖 View Ledger</button><button class="btn btn-outline btn-small" data-edit-customer="'+c.id+'">✏️ Edit</button><button class="btn btn-wa-due btn-small" data-new-book="'+c.id+'">📘 New Book</button></div></div>';
+  });
+  if(list.length>CUSTOMER_LIST_LIMIT) html+='<div class="btnrow"><button class="btn btn-outline" id="loadMoreBtn">Load More Customers ('+(list.length-CUSTOMER_LIST_LIMIT)+' remaining)</button></div>';
+  return html;
+}
+
+function renderAddCustomerOverlay(){
+  var root=document.getElementById('root'), source=(VIEW_PARAM?DATA.customers.find(function(x){return x.id===VIEW_PARAM;}):null), isNew=!!source;
+  var base=source||{}; var wrap=document.createElement('div'); wrap.className='overlay'; wrap.id='addOverlay';
+  wrap.innerHTML='<div class="sheet"><div class="sheet-header"><div style="display:flex;align-items:center;gap:8px;"><button class="closebtn" data-close-overlay="1">←</button><h2>'+(isNew?'New Book / New Loan':'Add Customer')+'</h2></div><button class="closebtn" data-close-overlay="1">✕</button></div><div class="card">'+
+    (isNew?'<div class="danger-note">Same mobile number is allowed. This creates a completely separate book/loan with its own ledger and payment history. Old completed history stays safe.</div>':'')+
+    '<label>Customer Name *</label><input type="text" id="f_name" value="'+escapeHtml(base.name||'')+'" placeholder="Full name">'+
+    '<label>Mobile Number *</label><input type="tel" id="f_mobile" value="'+escapeHtml(base.mobile||'')+'" placeholder="10-digit mobile number" maxlength="10">'+
+    '<label>Book / Loan Name</label><input type="text" id="f_bookTitle" value="'+escapeHtml(base.bookTitle||'Loan / Book')+'" placeholder="e.g. New Book">'+
+    '<label>Principal Amount (₹) *</label><input type="number" min="1" step="0.01" id="f_principal" value="'+(base.principal||'')+'" oninput="window.__cdmAutofillPlan()">'+
+    '<label>Collection Period (days) *</label><input type="number" min="1" step="1" id="f_period" value="'+(base.period||'')+'" oninput="window.__cdmAutofillDaily()">'+
+    '<label>Daily Collection Amount (₹) *</label><input type="number" min="0.01" step="0.01" id="f_daily" max="10000000" value="'+(base.dailyAmount||'')+'" placeholder="auto-calculated, editable">'+
+    '<div class="helpline">20% cut reference: <b id="f_cutPreview">'+inr(twentyPercentCut(base.principal||0))+'</b></div>'+
+    '<label>Custom Penalty per Late Day (₹)</label><input type="number" min="0" step="0.01" id="f_penalty" max="10000000" value="'+(base.penaltyPerDay!=null?base.penaltyPerDay:'')+'" placeholder="Leave blank for default">'+
+    '<label>Start Date *</label><input type="date" id="f_startDate" value="'+escapeHtml(isNew?todayISO():(base.startDate||todayISO()))+'">'+
+    '<label>Notes</label><textarea id="f_notes" rows="2" placeholder="Optional">'+escapeHtml(isNew?'':(base.notes||''))+'</textarea>'+
+    '<div class="btnrow"><button class="btn btn-outline" data-close-overlay="1">Cancel</button><button class="btn btn-primary" id="saveCustomerBtn">'+(isNew?'Create New Book':'Save Customer')+'</button></div></div></div>';
+  root.appendChild(wrap);
+  window.__cdmAutofillPlan=function(){var p=parseFloat(document.getElementById('f_principal').value)||0;document.getElementById('f_cutPreview').textContent=inr(twentyPercentCut(p));var per=document.getElementById('f_period');if(p===5000&&!per.value){per.value=30;window.__cdmAutofillDaily();}};
+  window.__cdmAutofillDaily=function(){var p=parseFloat(document.getElementById('f_principal').value)||0,per=parseFloat(document.getElementById('f_period').value)||0;if(p>0&&per>0)document.getElementById('f_daily').value=(p/per).toFixed(2);};
+  document.getElementById('saveCustomerBtn').addEventListener('click',async function(){
+    var name=document.getElementById('f_name').value.trim(),mobile=document.getElementById('f_mobile').value.trim(),bookTitle=document.getElementById('f_bookTitle').value.trim(),principal=parseFloat(document.getElementById('f_principal').value),period=parseInt(document.getElementById('f_period').value,10),daily=parseFloat(document.getElementById('f_daily').value),pen=document.getElementById('f_penalty').value.trim(),start=document.getElementById('f_startDate').value,notes=document.getElementById('f_notes').value;
+    if(!name||!validateMobile(mobile)||!principal||principal<=0||!period||period<=0||!daily||daily<=0||!start){showToast('Please fill all required fields correctly.');return;}
+    var saveBtnEl=this; saveBtnEl.disabled=true;
+    var created;
+    if(isNew) created = await addBookForCustomer(source.id,{name:name,mobile:mobile,bookTitle:bookTitle,principal:principal,period:period,dailyAmount:daily,penaltyPerDay:pen, startDate:start,notes:notes});
+    else created = await addCustomer({name:name,mobile:mobile,principal:principal,startDate:start,period:period,dailyAmount:daily,penaltyPerDay:pen,notes:notes});
+    if(!created){ saveBtnEl.disabled=false; return; }
+    showToast(isNew?'New book created successfully.':'Customer added successfully.'); history.back();
+  });
+  wrap.addEventListener('click',function(e){if(e.target.id==='addOverlay'||e.target.hasAttribute('data-close-overlay'))history.back();});
+}
+
+
+
+function renderMessageCenter(){
+  var rows=shailuTodayRows(),t=todayTotals(),type=COLLECTION_MSG_TYPE||'full',defaultNum=(DATA.settings&&DATA.settings.defaultCollectionNumber)||'';
+  var html='<div class="section-title">Message Type</div><div class="card"><div class="feature-grid">';
+  [['full','📊 Full'],['paid','🟢 Paid'],['unpaid','🔴 Unpaid'],['amount','💰 Amount']].forEach(function(x){html+='<button class="btn feature-btn '+(type===x[0]?'btn-primary':'btn-outline')+'" data-msgtype="'+x[0]+'">'+x[1]+'</button>';});
+  html+='</div>';
+  if(type==='amount') html+='<label>Amount to mention (₹)</label><input type="number" min="0.01" step="0.01" id="messageAmount" value="'+(DATA.settings.lastMessageAmount||'')+'">';
+  html+='<div class="btnrow"><button class="btn btn-wa-paid" id="quickSendCollectionBtn">⚡ Quick Send'+(defaultNum?' ('+escapeHtml(defaultNum)+')':'')+'</button></div>';
+  html+='<label>Mobile Number *</label><input type="tel" id="collWaNumber" maxlength="10" placeholder="10-digit mobile number" value="'+escapeHtml(defaultNum)+'">';
+  html+='<label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="collSaveDefault" style="width:auto;margin:0"> Save this number</label>';
+  html+='<div class="btnrow"><button class="btn btn-wa-paid" id="sendCollectionWaBtn">📲 WhatsApp</button></div><div class="btnrow"><button class="btn btn-outline" id="copyCollectionBtn">📋 Copy</button><button class="btn btn-outline" id="shareCollectionBtn">📤 Share</button></div>';
+  html+='<div class="section-title">Preview</div><div class="msg-preview">'+escapeHtml(getSelectedCollectionMessage())+'</div>';
+  html+='<div class="helpline" style="margin-top:10px">Paid: '+rows.paid.length+' · Unpaid: '+rows.pending.length+' · Collection: '+inr(t.totalCollected)+' · Expense: '+inr(t.expensesToday)+' · Net: '+inr(t.netCashToday)+'</div></div>';
+  return html;
+}
+
+function collectionWaMessage(){
+  var rows=shailuTodayRows(),t=todayTotals(),paidTotal=round2(rows.paid.reduce(function(a,r){return a+r.amount;},0)),unpaidTotal=round2(rows.pending.reduce(function(a,r){return a+(r.s.todaysDueAmount||0)+(r.s.penaltyDue||0);},0));
+  var lines=['Today\'s Collection Report — '+fmtDate(todayISO()),'',
+    'PAID CUSTOMERS ('+rows.paid.length+')'];
+  if(rows.paid.length) rows.paid.forEach(function(r,i){
+    lines.push((i+1)+'. '+r.c.name+' — '+inr(r.amount)+(r.penalty?' (Penalty '+inr(r.penalty)+')':''));
+  }); else lines.push('No paid customer for today.');
+  lines.push('Paid Total: '+inr(paidTotal),'',
+    'UNPAID CUSTOMERS ('+rows.pending.length+')');
+  if(rows.pending.length) rows.pending.forEach(function(r,i){
+    var due=round2((r.s.todaysDueAmount||0)+(r.s.penaltyDue||0));
+    lines.push((i+1)+'. '+r.c.name+' — Due '+inr(due));
+  }); else lines.push('No unpaid customer for today.');
+  lines.push('Unpaid Total Due: '+inr(unpaidTotal),'',
+    'DAILY TOTAL',
+    'Gross Collection: '+inr(t.totalCollected),
+    'Expense: '+inr(t.expensesToday),
+    'Net Collection (after Expense): '+inr(t.netCashToday),
+    'Pending Today: '+inr(t.totalPendingToday));
+  return lines.join('\n');
+}
+function paidOnlyMessage(){
+  var rows=shailuTodayRows(),t=todayTotals(),lines=['PAID CUSTOMERS — '+fmtDate(todayISO())];
+  if(!rows.paid.length)return lines.concat(['No paid customer for today.','Collection Total: '+inr(t.totalCollected),'Expense: '+inr(t.expensesToday),'Net after Expense: '+inr(t.netCashToday)]).join('\n');
+  rows.paid.forEach(function(r,i){lines.push((i+1)+'. '+r.c.name+' — '+inr(r.amount));});
+  lines.push('Collection Total: '+inr(t.totalCollected),'Expense: '+inr(t.expensesToday),'Net after Expense: '+inr(t.netCashToday));
+  return lines.join('\n');
+}
+function unpaidOnlyMessage(){
+  var rows=shailuTodayRows(),t=todayTotals(),lines=['UNPAID CUSTOMERS — '+fmtDate(todayISO())];
+  var unpaidTotal=round2(rows.pending.reduce(function(a,r){return a+(r.s.todaysDueAmount||0)+(r.s.penaltyDue||0);},0));
+  if(!rows.pending.length)return lines.concat(['No unpaid customer for today.','Unpaid Total Due: '+inr(unpaidTotal),'Collection: '+inr(t.totalCollected),'Expense: '+inr(t.expensesToday),'Net after Expense: '+inr(t.netCashToday)]).join('\n');
+  rows.pending.forEach(function(r,i){lines.push((i+1)+'. '+r.c.name+' — Due '+inr(round2((r.s.todaysDueAmount||0)+(r.s.penaltyDue||0))));});
+  lines.push('Unpaid Total Due: '+inr(unpaidTotal),'Collection: '+inr(t.totalCollected),'Expense: '+inr(t.expensesToday),'Net after Expense: '+inr(t.netCashToday));
+  return lines.join('\n');
+}
+function amountOnlyMessage(){var a=parseFloat((document.getElementById('messageAmount')||{}).value)||Number(DATA.settings.lastMessageAmount||0)||todayTotals().totalCollected;return 'Collection Amount — '+fmtDate(todayISO())+'\nAmount: '+inr(a);}
+function getSelectedCollectionMessage(){if(COLLECTION_MSG_TYPE==='paid')return paidOnlyMessage();if(COLLECTION_MSG_TYPE==='unpaid')return unpaidOnlyMessage();if(COLLECTION_MSG_TYPE==='amount')return amountOnlyMessage();return collectionWaMessage();}
+
+function renderReports(){
+  var t=todayTotals(),ym=REPORTS_MONTH||todayISO().slice(0,7),mcol=0,mpen=0,mcount=0,mexp=0,html='';
+  DATA.customers.forEach(function(c){(DATA.transactions[c.id]||[]).forEach(function(tx){if(tx.date&&tx.date.indexOf(ym)===0){mcol+=tx.amountPaid||0;mpen+=tx.penaltyPaid||0;if(!tx.isCorrection)mcount++;}})});
+  (DATA.expenses||[]).forEach(function(e){if(e.date&&e.date.indexOf(ym)===0)mexp+=e.amount||0;});
+  html+='<div class="section-title">Report Month</div><div class="card"><input type="month" id="reportMonthInput" value="'+escapeHtml(ym)+'"></div>';
+  html+='<div class="grid2">'+statCard('Payments',mcount)+statCard('Collection',inr(mcol))+statCard('Penalty',inr(mpen))+statCard('Expense',inr(mexp))+'</div>';
+  html+='<div class="section-title">Overall</div><div class="card">'+reportRow('Customers',t.uniqueCustomers)+reportRow('Active Loans',t.loanCount)+reportRow('Total Principal',inr(t.totalPrincipal))+reportRow('All-time Collected',inr(t.totalCollectedAll))+reportRow('Outstanding / Market',inr(t.marketOutstanding))+reportRow('Today Net Cash',inr(t.netCashToday))+'</div>';
+  html+='<div class="section-title">Last 15 Days</div><div class="card">';last15DayRows().forEach(function(d){html+='<div class="day-row"><div><b>'+fmtDate(d.date)+'</b><div class="sub">'+d.count+' payments · Expense '+inr(d.expense)+'</div></div><div style="text-align:right"><b>'+inr(d.total)+'</b><div class="sub">Net '+inr(d.net)+'</div></div></div>';});html+='</div>';
+  html+='<div class="section-title">Customer / Loan-wise</div>';DATA.customers.slice().sort(function(a,b){return a.name.localeCompare(b.name);}).forEach(function(c){var s=computeStats(c,DATA.transactions[c.id]||[],DATA.settings);html+='<div class="card" data-open-customer="'+c.id+'"><div class="crow"><div><div class="name">'+escapeHtml(c.name)+' <span class="loan-tag">'+escapeHtml(c.bookNo||'BOOK')+'</span></div><div class="sub">'+escapeHtml(c.mobile)+'</div></div><div class="amt">'+inr(s.totalCollected)+'</div></div><div class="sub">Outstanding '+inr(s.totalOutstanding)+' · '+(s.isCompleted?'Completed':'Active')+'</div></div>';});
+  return html;
+}
+
+function renderSettings(){
+  var s=DATA.settings,html='';
+  html+='<div class="section-title">Collection & Penalty</div><div class="card"><label>Default penalty per late day (₹)</label><input type="number" min="0" step="0.01" id="setPenalty" value="'+s.penaltyPerDay+'"><label>WhatsApp country code</label><input type="text" id="setCountryCode" value="'+escapeHtml(s.countryCode||'91')+'"></div>';
+  html+='<div class="section-title">Message Defaults</div><div class="card"><label>Default WhatsApp number</label><input type="tel" id="setDefaultCollNumber" maxlength="10" value="'+escapeHtml(s.defaultCollectionNumber||'')+'"><label>Payment Received Template</label><textarea id="setWaPaid" rows="3">'+escapeHtml(s.waPaidTemplate||defaultData().settings.waPaidTemplate)+'</textarea><label>Due Reminder Template</label><textarea id="setWaDue" rows="3">'+escapeHtml(s.waDueTemplate||defaultData().settings.waDueTemplate)+'</textarea><div class="btnrow"><button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button></div></div>';
+  html+='<div class="section-title">Data Safety</div><div class="card"><div class="danger-note">Normal delete always goes to the Recovery Bin. Permanent Delete is available only here/inside the Recovery Bin and requires confirmation. Live customers, active loans and current payment records are not permanently deleted from normal screens.</div><div class="btnrow"><button class="btn btn-primary" id="exportBtn">Export JSON Backup</button><button class="btn btn-outline" data-nav="trash">Recovery Bin</button></div><div class="btnrow"><button class="btn btn-danger" data-nav="trash">🗑️ Permanent Delete</button></div><div class="btnrow"><input type="file" id="importFile" accept=".json,application/json"><button class="btn btn-outline" id="importBtn">Restore JSON</button></div></div>';
+  html+='<div class="section-title">Excel</div><div class="card"><div class="helpline">Export customers, loans and transactions for spreadsheet use.</div><div class="btnrow"><button class="btn btn-primary" id="exportExcelBtn">Export Excel</button></div><input type="file" id="importExcelFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"><div class="btnrow"><button class="btn btn-outline" id="importExcelBtn">Restore Excel</button></div></div>';
+  html+='<div class="section-title">App Info</div><div class="card">Shailu Bhai Daily Collection<br><span class="sub">IndexedDB · '+DATA.customers.length+' loan records · '+(DATA.expenses||[]).length+' expenses</span></div>';
+  return html;
+}
+
+
+function renderTrash(){
+  var list=DATA.trash||[], expTrash=DATA.expenseTrash||[], html='<div class="section-title">Recovery Bin — Customers / Loans</div>';
+  html+='<div class="danger-note">Nothing here is permanently deleted. Restore any customer/loan when needed.</div>';
+  if(!list.length) html+='<div class="card empty">Recovery bin is empty.</div>';
+  list.slice().reverse().forEach(function(item,revIdx){var idx=list.length-1-revIdx,c=item.customer||{};html+='<div class="card"><div class="crow"><div><div class="name">'+escapeHtml(c.name||'Unknown')+'</div><div class="sub">'+escapeHtml(c.mobile||'')+' · '+escapeHtml(c.bookNo||'')+'</div></div><span class="badge">RECOVERY</span></div><div class="btnrow"><button class="btn btn-primary" data-restore-trash="'+idx+'">Restore</button><button class="btn btn-danger" data-delete-trash="'+idx+'">Permanent Delete</button></div></div>';});
+  html+='<div class="section-title">Recovery Bin — Expenses</div>'; if(!expTrash.length)html+='<div class="card empty">No deleted expenses.</div>'; expTrash.slice().reverse().forEach(function(item,revIdx){var idx=expTrash.length-1-revIdx,e=item.expense||{};html+='<div class="card"><div class="crow"><div><div class="name">'+escapeHtml(e.name||'Expense')+'</div><div class="sub">'+fmtDate(e.date)+' · '+inr(e.amount)+'</div></div></div><div class="btnrow"><button class="btn btn-primary" data-restore-expense="'+idx+'">Restore Expense</button><button class="btn btn-danger" data-delete-expense-forever="'+idx+'">Permanent Delete</button></div></div>';});
+  return html;
+}
+
+/* Keep the original handlers, then add the new Pro actions. */
+var __originalAttachGlobalHandlers=attachGlobalHandlers;
+attachGlobalHandlers=function(){
+  __originalAttachGlobalHandlers();
+  document.querySelectorAll('[data-new-book]').forEach(function(el){el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();setView('addCustomer',el.getAttribute('data-new-book'));});});
+  var messageAmount=document.getElementById('messageAmount');
+  if(messageAmount){ messageAmount.addEventListener('input',function(){ var preview=document.querySelector('.msg-preview'); if(preview) preview.textContent=amountOnlyMessage(); }); }
+  document.querySelectorAll('[data-toggle-last15]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var card=el.closest('.last15-card');
+      if(card) card.classList.toggle('open');
+    });
+  });
+};
+
+/* Save the selected amount when Amount message is used. */
+var __oldGetSelected=getSelectedCollectionMessage;
+getSelectedCollectionMessage=function(){
+  if(COLLECTION_MSG_TYPE==='amount'){
+    var el=document.getElementById('messageAmount');
+    if(el && parseFloat(el.value)>0){ DATA.settings.lastMessageAmount=round2(parseFloat(el.value)); saveData(DATA); return amountOnlyMessage(); }
+    return amountOnlyMessage();
+  }
+  return __oldGetSelected();
+};
+
+/* Excel export gets linked customer/loan identifiers for repeat-book tracing. */
+var __oldExportExcel=exportExcel;
+exportExcel=function(){
+  if(typeof XLSX==='undefined'){showToast('Excel library failed to load — check your internet connection.');return;}
+  __oldExportExcel();
+};
+
+/* ============================= BOOT ============================= */
+async function boot(){
+  try {
+    DATA = await loadData();
+    if (!DATA.settings) DATA.settings = defaultData().settings;
+    migrateShailuData();
+    await saveData(DATA);
+    if (!DATA.customers) DATA.customers = [];
+    if (!DATA.transactions) DATA.transactions = {};
+    if (!DATA.trash) DATA.trash = [];
+    if (!DATA.expenses) DATA.expenses = [];
+    if (!DATA.expenseTrash) DATA.expenseTrash = [];
+    try {
+      history.replaceState({view: "home", param: null}, "", "");
+    } catch(e){}
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+    render();
+  } catch(err){
+    // Last-resort fallback so the app never gets stuck on the loading
+    // screen forever if storage init throws for an unexpected reason.
+    usingFallback = true;
+    DATA = defaultData();
+    try { render(); } catch(e2){
+      var root = document.getElementById("root");
+      if (root) root.innerHTML = '<div class="loading">Something went wrong loading your data. Please reload the page.</div>';
+    }
+  }
+}
+
+/* Delegated WhatsApp-link handling (invalid number toast + native app opener) */
+document.addEventListener("click", function(ev){
+  var a = (ev.target && ev.target.closest) ? ev.target.closest("a.wa-link") : null;
+  if (!a) return;
+  var href = a.getAttribute("href") || "";
+  if (href === "#wa-invalid"){
+    ev.preventDefault();
+    showToast("Please enter a valid 10-digit Indian mobile number before using WhatsApp.");
+    return;
+  }
+  if (window.AndroidBridge && window.AndroidBridge.openUrl){
+    ev.preventDefault();
+    window.AndroidBridge.openUrl(href);
+  }
+}, true);
+
+/* App left open past midnight: refresh "today" figures when the user comes back */
+var LAST_DAY = todayISO();
+function refreshIfDayChanged(){
+  if (document.visibilityState === "hidden" || !DATA) return;
+  var t = todayISO();
+  if (t === LAST_DAY) return;
+  LAST_DAY = t;
+  if (document.querySelector(".overlay")) return;
+  if (["home","customers","history","reports","message","expenses","trash","settings"].indexOf(VIEW) === -1) return;
+  render();
+}
+document.addEventListener("visibilitychange", refreshIfDayChanged);
+window.addEventListener("focus", refreshIfDayChanged);
+
+boot();
+
+})();
+</script>
+</body>
+</html>
